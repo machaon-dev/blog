@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ru" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<title>Posts - Machaon.Dev blog</title>
+
+<meta name="keywords" content="" />
+<meta name="description" content="Делимся полезным.">
+<meta name="author" content="Eugene Zadorin">
+<link rel="canonical" href="https://machaon-dev.github.io/blog/posts/" />
+<link href="https://machaon-dev.github.io/blog/assets/css/stylesheet.min.5f7d0b69564952927bd9abb7b81b216c6c98e8781c491fd48bffb8c7c130b26f.css" integrity="sha256-X30LaVZJUpJ72au3uBshbGyY6HgcSR/Ui/&#43;4x8Ewsm8=" rel="preload stylesheet"
+    as="style">
+<link rel="manifest" href="https://machaon-dev.github.io/blog/site.webmanifest">
+<link rel="icon" href="https://machaon-dev.github.io/blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://machaon-dev.github.io/blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://machaon-dev.github.io/blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://machaon-dev.github.io/blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://machaon-dev.github.io/blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<meta name="generator" content="Hugo 0.78.1" />
+<link rel="alternate" type="application/rss&#43;xml" href="https://machaon-dev.github.io/blog/posts/index.xml">
+
+
+
+
+</head>
+
+<body class="list" id="top">
+<noscript>
+    <style type="text/css">
+        .theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+</noscript>
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://machaon-dev.github.io/blog/" accesskey="h">Machaon.Dev blog</a>
+            <span class="logo-switches">
+                
+            </span>
+        </div>
+        <ul class="menu" id="menu" onscroll="menu_on_scroll()"></ul>
+    </nav>
+</header>
+
+    <main class="main"> 
+<header class="page-header">
+  <h1>Posts</h1>
+</header>
+
+
+
+<article class="post-entry"> 
+
+  <header class="entry-header">
+    <h2>
+      БУС и инъекция зависимостей в классовые компоненты
+    </h2>
+  </header>
+  <section class="entry-content">
+    <p>В 2020 году будет тратой времени объяснять, что такое dependency injection и какую пользу построение ядра вокруг контейнера зависимостей приносит современному PHP-проекту. Программистам, полноценно работающим с платформой 1С-Битрикc, дополнительно нет смысла рассказывать, какой процент стандартных модулей платформы этот паттерн применяет (на всякий случай - ноль, нет его там в принципе). Но, несмотря на то, что нет - хочется. А если хочется, то стоит попробовать, независимо от того, что получится в итоге.</p>
+  </section>
+  <footer class="entry-footer">
+
+November 5, 2020&nbsp;·&nbsp;Александр Селюченко
+</footer>
+  <a class="entry-link" aria-label="post link to БУС и инъекция зависимостей в классовые компоненты" href="https://machaon-dev.github.io/blog/posts/bitrix-di-in-class-components/"></a>
+</article>
+<article class="post-entry"> 
+
+  <header class="entry-header">
+    <h2>
+      Going remote: советы самому себе перед вторым локдауном
+    </h2>
+  </header>
+  <section class="entry-content">
+    <p>2020 год определенно запомнится нам надолго, в том числе благодаря всеобщей вынужденной удаленке. Для многих компаний это стало настоящим испытанием, но мы выдержали его достойно. Впереди (не точно) карантин №2 — самое время обдумать и записать, как жить и работать в новой реальности</p>
+  </section>
+  <footer class="entry-footer">
+
+October 30, 2020&nbsp;·&nbsp;Eugene Zadorin
+</footer>
+  <a class="entry-link" aria-label="post link to Going remote: советы самому себе перед вторым локдауном" href="https://machaon-dev.github.io/blog/posts/going-remote/"></a>
+</article>
+
+    </main><footer class="footer">
+    <span>&copy; 2020 <a href="https://machaon-dev.github.io/blog/">Machaon.Dev blog</a></span>
+    <span>&middot;</span>
+    <span>Powered by <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a></span>
+    <span>&middot;</span>
+    <span>Theme <a href="https://git.io/hugopapermod" rel="noopener" target="_blank">PaperMod</a></span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top" accesskey="g">
+    <button class="top-link" id="top-link" type="button">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6">
+            <path d="M12 6H0l6-6z" /></svg>
+    </button>
+</a>
+
+
+<script>
+    window.onload = function () {
+        if (localStorage.getItem("menu-scroll-position")) {
+            document.getElementById('menu').scrollLeft = localStorage.getItem("menu-scroll-position");
+        }
+    }
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            document.querySelector(`[id='${id}']`).scrollIntoView({
+                behavior: "smooth"
+            });
+        });
+    });
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+    function menu_on_scroll() {
+        localStorage.setItem("menu-scroll-position", document.getElementById('menu').scrollLeft);
+    }
+</script>
+<script>
+    localStorage.removeItem("pref-theme");
+</script>
+
+</body>
+
+</html>

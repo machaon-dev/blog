@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on Machaon.Dev blog</title>
+    <link>https://machaon-dev.github.io/blog/posts/</link>
+    <description>Recent content in Posts on Machaon.Dev blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ru-ru</language>
+    <lastBuildDate>Thu, 05 Nov 2020 12:00:00 +0300</lastBuildDate><atom:link href="https://machaon-dev.github.io/blog/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>БУС и инъекция зависимостей в классовые компоненты</title>
+      <link>https://machaon-dev.github.io/blog/posts/bitrix-di-in-class-components/</link>
+      <pubDate>Thu, 05 Nov 2020 12:00:00 +0300</pubDate>
+      
+      <guid>https://machaon-dev.github.io/blog/posts/bitrix-di-in-class-components/</guid>
+      <description>В 2020 году будет тратой времени объяснять, что такое dependency injection и какую пользу построение ядра вокруг контейнера зависимостей приносит современному PHP-проекту. Программистам, полноценно работающим с платформой 1С-Битрикc, дополнительно нет смысла рассказывать, какой процент стандартных модулей платформы этот паттерн применяет (на всякий случай - ноль, нет его там в принципе). Но, несмотря на то, что нет - хочется. А если хочется, то стоит попробовать, независимо от того, что получится в итоге.</description>
+    </item>
+    
+    <item>
+      <title>Going remote: советы самому себе перед вторым локдауном</title>
+      <link>https://machaon-dev.github.io/blog/posts/going-remote/</link>
+      <pubDate>Fri, 30 Oct 2020 12:59:00 +0300</pubDate>
+      
+      <guid>https://machaon-dev.github.io/blog/posts/going-remote/</guid>
+      <description>2020 год определенно запомнится нам надолго, в том числе благодаря всеобщей вынужденной удаленке. Для многих компаний это стало настоящим испытанием, но мы выдержали его достойно. Впереди (не точно) карантин №2 — самое время обдумать и записать, как жить и работать в новой реальности</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="ru" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<title>БУС и инъекция зависимостей в классовые компоненты - Machaon.Dev blog</title>
+
+<meta name="keywords" content="" />
+<meta name="description" content="В 2020 году будет тратой времени объяснять, что такое dependency injection и какую пользу построение ядра вокруг контейнера зависимостей приносит современному PHP-проекту. Программистам, полноценно работающим с платформой 1С-Битрикc, дополнительно нет смысла рассказывать, какой процент стандартных модулей платформы этот паттерн применяет (на всякий случай - ноль, нет его там в принципе). Но, несмотря на то, что нет - хочется. А если хочется, то стоит попробовать, независимо от того, что получится в итоге.">
+<meta name="author" content="Александр Селюченко">
+<link rel="canonical" href="https://machaon-dev.github.io/blog/posts/bitrix-di-in-class-components/" />
+<link href="https://machaon-dev.github.io/blog/assets/css/stylesheet.min.5f7d0b69564952927bd9abb7b81b216c6c98e8781c491fd48bffb8c7c130b26f.css" integrity="sha256-X30LaVZJUpJ72au3uBshbGyY6HgcSR/Ui/&#43;4x8Ewsm8=" rel="preload stylesheet"
+    as="style">
+<link rel="manifest" href="https://machaon-dev.github.io/blog/site.webmanifest">
+<link rel="icon" href="https://machaon-dev.github.io/blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://machaon-dev.github.io/blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://machaon-dev.github.io/blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://machaon-dev.github.io/blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://machaon-dev.github.io/blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<meta name="generator" content="Hugo 0.78.1" />
+
+
+
+
+</head>
+
+<body class="single" id="top">
+<noscript>
+    <style type="text/css">
+        .theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+</noscript>
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://machaon-dev.github.io/blog/" accesskey="h">Machaon.Dev blog</a>
+            <span class="logo-switches">
+                
+            </span>
+        </div>
+        <ul class="menu" id="menu" onscroll="menu_on_scroll()"></ul>
+    </nav>
+</header>
+
+    <main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <h1 class="post-title">
+      БУС и инъекция зависимостей в классовые компоненты
+    </h1>
+    <div class="post-meta">
+
+November 5, 2020&nbsp;·&nbsp;Александр Селюченко
+
+    </div>
+  </header> 
+
+  <div class="post-content"><blockquote>
+<p>Эта статья изначально была написана <a href="https://blog.segfault.pro/posts/bitrix-di-in-class-components">в личном блоге автора</a></p>
+</blockquote>
+<p>В 2020 году будет тратой времени объяснять, что такое dependency injection и какую пользу построение ядра вокруг
+контейнера зависимостей приносит современному PHP-проекту. Программистам, полноценно работающим
+с платформой 1С-Битрикc, дополнительно нет смысла рассказывать, какой процент стандартных модулей
+платформы этот паттерн применяет (на всякий случай - ноль, нет его там в принципе).</p>
+<p>Но, несмотря на то, что нет - хочется. А если хочется, то стоит попробовать,
+независимо от того, <em>что</em> получится в итоге.</p>
+<h2 id="введение">Введение</h2>
+<p>В целом, весь код проекта на БУС можно разделить на 3 группы:</p>
+<ol>
+<li>
+<p>Модули ядра. Не будет использовать DI никогда.</p>
+</li>
+<li>
+<p>Изолированные модули и скрипты интегратора - до тех пор, пока мы не взаимодействуем с API ядра,
+построить взаимодействие на основе контейнера, как стороннего решения из числа популярных,
+так и самописного не составляет труда.</p>
+</li>
+<li>
+<p>Классы интегратора на основе классов ядра, загружаемые и используемые ядром по особой логике.
+Самый распространенный пример - классовые компоненты, наследуемые от <code>\CBitrixComponent</code>.</p>
+</li>
+</ol>
+<p>С п. 1 ничего не сделать, как по причине проблем с обновлениями, так и объемом работ, даже в случае ограниченных правок.</p>
+<p>С п.2 делать ничего не нужно.</p>
+<p>П. 3 представляет наибольший интерес с практической точки зрения. Де-факто компонент - это фронт контроллер
+с функционалом роутера (случай комплексного компонента). В случае с реализацией интерфейса <code>Controllerable</code>, также
+со способностью декларативного описания поддерживаемых действия и подключения middleware - то есть, почти индустриальный
+стандарт. Осталось добавить возможность инъекции инстансов, для начала в конструктор, и программистам на Laravel будет
+нечего противопоставить мощи двухсот мегабайт отечественного кода:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php"><span style="color:#000;font-weight:bold">class</span> <span style="color:#458;font-weight:bold">FooComponent</span> <span style="color:#000;font-weight:bold">extends</span> \CBitrixComponent
+{
+     <span style="color:#d14">/**
+</span><span style="color:#d14">     * @param \CBitrixComponent|null $component
+</span><span style="color:#d14">     * @throws \LoaderException
+</span><span style="color:#d14">     */</span>
+    <span style="color:#000;font-weight:bold">public</span> <span style="color:#000;font-weight:bold">function</span> __construct(
+        <span style="color:#000;font-weight:bold">?</span>\CBitrixComponent <span style="color:#008080">$component</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">null</span>,
+        <span style="color:#000;font-weight:bold">?</span>\SomeService <span style="color:#008080">$service</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">null</span>
+    ) {
+        <span style="color:#000;font-weight:bold">parent</span><span style="color:#000;font-weight:bold">::</span><span style="color:#008080">__construct</span>(<span style="color:#008080">$component</span>);
+
+        <span style="color:#008080">$this</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">service</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#008080">$service</span>;
+    }
+}
+</code></pre></div><p>Осталось понять, как это реализовать.</p>
+<h2 id="анализ">Анализ</h2>
+<p>На первый взгляд - никак. Но, чтобы быть уверенными, пройдем с отладчиком, чтобы заявлять об этом
+с уверенностью и полным знанием процесса загрузки компонентов.</p>
+<ul>
+<li>
+<p>Точка входа - вызов метода <code>IncludeComponent()</code> синглтона <code>$APPLICATION</code>:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php"><span style="color:#008080">$APPLICATION</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">IncludeComponent</span>(
+    <span style="color:#d14">&#34;custom:system.empty&#34;</span>,
+    <span style="color:#d14">&#34;index_welcome&#34;</span>,
+    [],
+    <span style="color:#000;font-weight:bold">false</span>
+);
+</code></pre></div></li>
+<li>
+<p>Метод проверяет параметры, флаги отладки, вычисляет путь к компоненту по его имени, создает
+пустой инстанс <code>\CBitrixComponent</code>, инициализирует его и выполняет собственно подключение компонента через
+его нестатический метод <code>IncludeComponent()</code> :</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php"><span style="color:#000;font-weight:bold">public</span> <span style="color:#000;font-weight:bold">function</span> <span style="color:#900;font-weight:bold">IncludeComponent</span>(
+  <span style="color:#008080">$componentName</span>,
+  <span style="color:#008080">$componentTemplate</span>,
+  <span style="color:#008080">$arParams</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">array</span>(),
+  <span style="color:#008080">$parentComponent</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">null</span>,
+  <span style="color:#008080">$arFunctionParams</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">array</span>(),
+  <span style="color:#008080">$returnResult</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">false</span>
+) {
+  <span style="color:#998;font-style:italic">// ...
+</span><span style="color:#998;font-style:italic"></span>  <span style="color:#008080">$component</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">new</span> CBitrixComponent();
+  <span style="color:#000;font-weight:bold">if</span> (<span style="color:#008080">$component</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">InitComponent</span>(<span style="color:#008080">$componentName</span>)) {
+      <span style="color:#998;font-style:italic">// ...
+</span><span style="color:#998;font-style:italic"></span>      <span style="color:#000;font-weight:bold">if</span> (<span style="color:#008080">$bComponentEnabled</span>) {
+          <span style="color:#998;font-style:italic">// ...
+</span><span style="color:#998;font-style:italic"></span>          <span style="color:#008080">$result</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#008080">$component</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">IncludeComponent</span>(
+              <span style="color:#008080">$componentTemplate</span>,
+              <span style="color:#008080">$arParams</span>,
+              <span style="color:#008080">$parentComponent</span>,
+              <span style="color:#008080">$returnResult</span>
+          );
+          <span style="color:#998;font-style:italic">// ...
+</span><span style="color:#998;font-style:italic"></span>      }
+      <span style="color:#998;font-style:italic">// ...
+</span><span style="color:#998;font-style:italic"></span>  }
+  <span style="color:#998;font-style:italic">// ...
+</span><span style="color:#998;font-style:italic"></span>}
+</code></pre></div></li>
+<li>
+<p>Ключевые моменты инициализации и подключения выглядят так:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php"><span style="color:#000;font-weight:bold">final</span> <span style="color:#000;font-weight:bold">public</span> <span style="color:#000;font-weight:bold">function</span> <span style="color:#900;font-weight:bold">initComponent</span>(<span style="color:#008080">$componentName</span>, <span style="color:#008080">$componentTemplate</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">false</span>)
+{
+    <span style="color:#008080">$path2Comp</span> <span style="color:#000;font-weight:bold">=</span> CComponentEngine<span style="color:#000;font-weight:bold">::</span><span style="color:#008080">MakeComponentPath</span>(<span style="color:#008080">$componentName</span>);
+    <span style="color:#008080">$componentPath</span> <span style="color:#000;font-weight:bold">=</span> getLocalPath(<span style="color:#d14">&#34;components&#34;</span><span style="color:#000;font-weight:bold">.</span><span style="color:#008080">$path2Comp</span>);
+    <span style="color:#008080">$this</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">classOfComponent</span> <span style="color:#000;font-weight:bold">=</span> self<span style="color:#000;font-weight:bold">::</span><span style="color:#008080">__getClassForPath</span>(<span style="color:#008080">$componentPath</span>);
+}
+
+<span style="color:#000;font-weight:bold">final</span> <span style="color:#000;font-weight:bold">public</span> <span style="color:#000;font-weight:bold">function</span> <span style="color:#900;font-weight:bold">includeComponent</span>(
+    <span style="color:#008080">$componentTemplate</span>,
+    <span style="color:#008080">$arParams</span>,
+    <span style="color:#008080">$parentComponent</span>,
+    <span style="color:#008080">$returnResult</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">false</span>
+) {
+    <span style="color:#000;font-weight:bold">if</span> (<span style="color:#008080">$parentComponent</span> instanceof CBitrixComponent) {
+        <span style="color:#008080">$this</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">__parent</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#008080">$parentComponent</span>;
+    }
+
+    <span style="color:#000;font-weight:bold">if</span> (<span style="color:#008080">$this</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">classOfComponent</span>) {
+        <span style="color:#008080">$component</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">new</span> <span style="color:#008080">$this</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">classOfComponent</span>(<span style="color:#008080">$this</span>);
+
+        <span style="color:#008080">$component</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">arParams</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#008080">$component</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">onPrepareComponentParams</span>(<span style="color:#008080">$arParams</span>);
+        <span style="color:#008080">$component</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">__prepareComponentParams</span>(<span style="color:#008080">$component</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">arParams</span>);
+
+        <span style="color:#000;font-weight:bold">if</span> (<span style="color:#008080">$returnResult</span>) {
+            <span style="color:#008080">$component</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">executeComponent</span>();
+            <span style="color:#008080">$result</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#008080">$component</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">arResult</span>;
+        } <span style="color:#000;font-weight:bold">else</span> {
+            <span style="color:#008080">$result</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#008080">$component</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">executeComponent</span>();
+       }
+    } <span style="color:#000;font-weight:bold">else</span> {
+        <span style="color:#998;font-style:italic">// Работа с бесклассовыми компонентами
+</span><span style="color:#998;font-style:italic"></span>    }
+
+    <span style="color:#000;font-weight:bold">return</span> <span style="color:#008080">$result</span>;
+}
+</code></pre></div><p>Прямой вызов оператора <code>new</code> с единственным параметром. Совершенно ясно, что в этом методе ловить нечего.
+Но класс компонента создается динамичеcки, и на основе не константы, а классового свойства, вычисляемого же
+статическим (!) методом <code>__getClassForPath</code>. Взглянем туда:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php"><span style="color:#000;font-weight:bold">final</span> <span style="color:#000;font-weight:bold">private</span> <span style="color:#000;font-weight:bold">function</span> <span style="color:#900;font-weight:bold">__getClassForPath</span>(<span style="color:#008080">$componentPath</span>)
+{
+   <span style="color:#000;font-weight:bold">if</span> (<span style="color:#000;font-weight:bold">!</span>isset(self<span style="color:#000;font-weight:bold">::</span><span style="color:#008080">$__classes_map</span>[<span style="color:#008080">$componentPath</span>])) {
+       <span style="color:#008080">$fname</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#008080">$_SERVER</span>[<span style="color:#d14">&#34;DOCUMENT_ROOT&#34;</span>] <span style="color:#000;font-weight:bold">.</span> <span style="color:#008080">$componentPath</span> <span style="color:#000;font-weight:bold">.</span> <span style="color:#d14">&#34;/class.php&#34;</span>;
+
+       <span style="color:#000;font-weight:bold">if</span> (file_exists(<span style="color:#008080">$fname</span>) <span style="color:#000;font-weight:bold">&amp;&amp;</span> is_file(<span style="color:#008080">$fname</span>)) {
+           <span style="color:#008080">$beforeClasses</span> <span style="color:#000;font-weight:bold">=</span> get_declared_classes();
+           <span style="color:#008080">$beforeClassesCount</span> <span style="color:#000;font-weight:bold">=</span> count(<span style="color:#008080">$beforeClasses</span>);
+           <span style="color:#000;font-weight:bold">include_once</span>(<span style="color:#008080">$fname</span>);
+           <span style="color:#008080">$afterClasses</span> <span style="color:#000;font-weight:bold">=</span> get_declared_classes();
+           <span style="color:#008080">$afterClassesCount</span> <span style="color:#000;font-weight:bold">=</span> count(<span style="color:#008080">$afterClasses</span>);
+
+           <span style="color:#000;font-weight:bold">for</span> (<span style="color:#008080">$i</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#008080">$beforeClassesCount</span>; <span style="color:#008080">$i</span> <span style="color:#000;font-weight:bold">&lt;</span> <span style="color:#008080">$afterClassesCount</span>; <span style="color:#008080">$i</span><span style="color:#000;font-weight:bold">++</span>) {
+               <span style="color:#000;font-weight:bold">if</span> (<span style="color:#000;font-weight:bold">!</span>isset(self<span style="color:#000;font-weight:bold">::</span><span style="color:#008080">$classes</span>[<span style="color:#008080">$afterClasses</span>[<span style="color:#008080">$i</span>]])
+                   <span style="color:#000;font-weight:bold">&amp;&amp;</span> is_subclass_of(<span style="color:#008080">$afterClasses</span>[<span style="color:#008080">$i</span>], <span style="color:#d14">&#34;cbitrixcomponent&#34;</span>)
+               ) {
+                   <span style="color:#000;font-weight:bold">if</span> (<span style="color:#000;font-weight:bold">!</span>isset(self<span style="color:#000;font-weight:bold">::</span><span style="color:#008080">$__classes_map</span>[<span style="color:#008080">$componentPath</span>])
+                       <span style="color:#000;font-weight:bold">||</span> is_subclass_of(
+                              <span style="color:#008080">$afterClasses</span>[<span style="color:#008080">$i</span>],
+                              self<span style="color:#000;font-weight:bold">::</span><span style="color:#008080">$__classes_map</span>[<span style="color:#008080">$componentPath</span>]
+                          )
+                   ) {
+                       self<span style="color:#000;font-weight:bold">::</span><span style="color:#008080">$__classes_map</span>[<span style="color:#008080">$componentPath</span>] <span style="color:#000;font-weight:bold">=</span> <span style="color:#008080">$afterClasses</span>[<span style="color:#008080">$i</span>];
+                       self<span style="color:#000;font-weight:bold">::</span><span style="color:#008080">$classes</span>[<span style="color:#008080">$afterClasses</span>[<span style="color:#008080">$i</span>]] <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">true</span>;
+                   }
+               }
+           }
+       } <span style="color:#000;font-weight:bold">else</span> {
+           self<span style="color:#000;font-weight:bold">::</span><span style="color:#008080">$__classes_map</span>[<span style="color:#008080">$componentPath</span>] <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;&#34;</span>;
+       }
+   }
+
+   <span style="color:#000;font-weight:bold">return</span> self<span style="color:#000;font-weight:bold">::</span><span style="color:#008080">$__classes_map</span>[<span style="color:#008080">$componentPath</span>];
+ }
+</code></pre></div><p>Метод вычисляет, какой же именно класс из подключившихся при загрузке файла, нужно
+интерпретировать как компонент. Итоговый класс заносится в кеш <code>$__classes_map</code> -
+это статическое свойство, значение которого в ходе нормальной работы ядра никогда не
+определяется.</p>
+</li>
+</ul>
+<p>Итог анализа: мы совершенно точно не можем сделать так, чтобы \CBitrixComponent внедрял зависимости
+в конструктор конкретного класса компонента при его инстанциации без модификации ядра .</p>
+<p>Но еще раз перечитаем ТЗ и посмотрим на код свежим взглядом - вопрос-то не в этом.
+Не в строгой реализации некоторого паттерна, а в том, чтобы эти зависимости компонент так или иначе получал.</p>
+<p>Это возможно в случае, если мы контролируем вызов <code>new</code>,
+и, помимо инстанциации экземпляра самого класса, есть ровно два варианта,
+как можно этого добиться - наследование или делегирование. Подмена класса компонента классом
+наследника, который сможет разрешать значения параметров конструктора родителя,
+либо же классом, создающем хранящий экземпляр компонента на своих условиях.
+хранящем его в своем <code>private</code>-свойстве и делегирующем в него вызовы методов компонента.</p>
+<p>Вариант 1 проще в реализации и жизнеспособнее за счет поддержки полиморфизма - остановимся на нём.</p>
+<h2 id="реализация">Реализация</h2>
+<h3 id="шаг-1-подмена-имени-класса">Шаг 1: Подмена имени класса</h3>
+<p>Карта классов, как уже упоминалось, хранится в <code>private static self::$__classes_map</code>
+с начальным значением в виде пустого массива. Заменим значение этого свойства на наследник <code>\ArrayObject</code>,
+реализующий нужную нам логику <code>offsetGet</code> или <code>offsetSet</code>. Саму же замену произведем с помощью особенностей
+класса <code>\Closure</code>:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php"><span style="color:#000;font-weight:bold">function</span> <span style="color:#900;font-weight:bold">invoke_internal</span>(<span style="color:#008080">$instance</span>, \Closure <span style="color:#008080">$closure</span>)
+{
+    <span style="color:#000;font-weight:bold">return</span> <span style="color:#008080">$closure</span>
+        <span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">bindTo</span>(<span style="color:#008080">$instance</span>, get_class(<span style="color:#008080">$instance</span>))
+        <span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">call</span>(<span style="color:#008080">$instance</span>);
+}
+
+invoke_internal(<span style="color:#000;font-weight:bold">new</span> \CBitrixComponent(), <span style="color:#000;font-weight:bold">function</span> () {
+    <span style="color:#008080">$agent</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">new</span> ComponentInterceptorAgent(<span style="color:#000;font-weight:bold">static</span><span style="color:#000;font-weight:bold">::</span><span style="color:#008080">$__classes_map</span>);
+    <span style="color:#000;font-weight:bold">static</span><span style="color:#000;font-weight:bold">::</span><span style="color:#008080">$__classes_map</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#008080">$agent</span>;
+});
+</code></pre></div><p>Код заменяющего класса в сокращенном виде:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php"><span style="color:#000;font-weight:bold">class</span> <span style="color:#458;font-weight:bold">ComponentInterceptorAgent</span> <span style="color:#000;font-weight:bold">extends</span> \ArrayObject
+{
+    <span style="color:#d14">/**
+</span><span style="color:#d14">     * @param array $input
+</span><span style="color:#d14">     * @param int $flags
+</span><span style="color:#d14">     * @param string $iterator_class
+</span><span style="color:#d14">     */</span>
+    <span style="color:#000;font-weight:bold">public</span> <span style="color:#000;font-weight:bold">function</span> __construct(<span style="color:#008080">$input</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">array</span>(), <span style="color:#008080">$flags</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">0</span>, <span style="color:#008080">$iterator_class</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;ArrayIterator&#34;</span>)
+    {
+        <span style="color:#000;font-weight:bold">parent</span><span style="color:#000;font-weight:bold">::</span><span style="color:#008080">__construct</span>(<span style="color:#008080">$input</span>, <span style="color:#008080">$flags</span>, <span style="color:#008080">$iterator_class</span>);
+
+        <span style="color:#000;font-weight:bold">foreach</span> (<span style="color:#008080">$input</span> <span style="color:#000;font-weight:bold">as</span> <span style="color:#008080">$componentPath</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#008080">$componentClass</span>) {
+            <span style="color:#008080">$this</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">classCache</span>[<span style="color:#008080">$componentClass</span>] <span style="color:#000;font-weight:bold">=</span> <span style="color:#008080">$this</span>[<span style="color:#008080">$componentPath</span>];
+        }
+    }
+
+    <span style="color:#d14">/**
+</span><span style="color:#d14">     * @param string $componentPath
+</span><span style="color:#d14">     * @return mixed
+</span><span style="color:#d14">     * @throws \ReflectionException
+</span><span style="color:#d14">     */</span>
+    <span style="color:#000;font-weight:bold">public</span> <span style="color:#000;font-weight:bold">function</span> <span style="color:#900;font-weight:bold">offsetGet</span>(<span style="color:#008080">$componentPath</span>)
+    {
+        <span style="color:#008080">$componentClass</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">parent</span><span style="color:#000;font-weight:bold">::</span><span style="color:#008080">offsetGet</span>(<span style="color:#008080">$componentPath</span>);
+
+        <span style="color:#000;font-weight:bold">if</span> (<span style="color:#000;font-weight:bold">!</span><span style="color:#008080">$componentClass</span>) {
+            <span style="color:#008080">$this</span>[<span style="color:#008080">$componentPath</span>] <span style="color:#000;font-weight:bold">=</span> <span style="color:#008080">$componentClass</span>;
+            <span style="color:#000;font-weight:bold">return</span> <span style="color:#008080">$componentClass</span>;
+        }
+
+        <span style="color:#000;font-weight:bold">if</span> (in_array(<span style="color:#008080">$componentClass</span>, <span style="color:#008080">$this</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">wrapperCache</span>)) {
+            <span style="color:#000;font-weight:bold">return</span> <span style="color:#008080">$componentClass</span>;
+        }
+
+        <span style="color:#008080">$predicate</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#008080">$this</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">options</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">getPredicate</span>();
+
+        <span style="color:#000;font-weight:bold">if</span> (isset(<span style="color:#008080">$predicate</span>) <span style="color:#000;font-weight:bold">&amp;&amp;</span> <span style="color:#000;font-weight:bold">!</span><span style="color:#008080">$predicate</span>(<span style="color:#008080">$componentClass</span>)) {
+            <span style="color:#008080">$this</span>[<span style="color:#008080">$componentPath</span>] <span style="color:#000;font-weight:bold">=</span> <span style="color:#008080">$componentClass</span>;
+            <span style="color:#000;font-weight:bold">return</span> <span style="color:#008080">$componentClass</span>;
+        }
+
+        <span style="color:#008080">$parentClass</span> <span style="color:#000;font-weight:bold">=</span> Classname<span style="color:#000;font-weight:bold">::</span><span style="color:#008080">from</span>(<span style="color:#008080">$componentClass</span>);
+        <span style="color:#008080">$wrapperClass</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#008080">$this</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">getWrapperClass</span>(<span style="color:#008080">$parentClass</span>);
+
+        <span style="color:#000;font-weight:bold">if</span> (<span style="color:#000;font-weight:bold">!</span>isset(<span style="color:#008080">$this</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">classCache</span>[<span style="color:#008080">$componentClass</span>])) {
+            <span style="color:#008080">$reflection</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">new</span> \ReflectionClass(<span style="color:#008080">$componentClass</span>);
+
+            <span style="color:#000;font-weight:bold">if</span> (<span style="color:#008080">$reflection</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">isFinal</span>()) {
+                <span style="color:#008080">$this</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">classCache</span>[<span style="color:#008080">$componentClass</span>] <span style="color:#000;font-weight:bold">=</span> <span style="color:#008080">$componentClass</span>;
+                <span style="color:#008080">$this</span>[<span style="color:#008080">$componentPath</span>] <span style="color:#000;font-weight:bold">=</span> <span style="color:#008080">$componentClass</span>;
+            } <span style="color:#000;font-weight:bold">else</span> {
+                <span style="color:#008080">$options</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">new</span> WrapperOptions(
+                    <span style="color:#008080">$wrapperClass</span>,
+                    <span style="color:#008080">$parentClass</span>,
+                    <span style="color:#008080">$this</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">options</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">getMethodDelegate</span>()
+                );
+
+                <span style="color:#008080">$builder</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">new</span> WrapperBuilder();
+                <span style="color:#008080">$wrapper</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#008080">$builder</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">buildWrapperComponent</span>(<span style="color:#008080">$options</span>);
+                <span style="color:#008080">$evaluator</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">new</span> WrapperDeployer();
+                <span style="color:#008080">$evaluator</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">deployWrapperClass</span>(<span style="color:#008080">$wrapper</span>);
+
+                <span style="color:#008080">$this</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">classCache</span>[<span style="color:#008080">$componentClass</span>] <span style="color:#000;font-weight:bold">=</span> (string) <span style="color:#008080">$wrapperClass</span>;
+                <span style="color:#008080">$this</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">wrapperCache</span>[] <span style="color:#000;font-weight:bold">=</span> (string) <span style="color:#008080">$wrapperClass</span>;
+                <span style="color:#008080">$this</span>[<span style="color:#008080">$componentPath</span>] <span style="color:#000;font-weight:bold">=</span> (string) <span style="color:#008080">$wrapperClass</span>;
+            }
+        }
+
+        <span style="color:#000;font-weight:bold">return</span> <span style="color:#008080">$this</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">classCache</span>[<span style="color:#008080">$componentClass</span>];
+    }
+}
+</code></pre></div><p>Как видно из кода, переопределяется метод чтения из массива - можно было переопределить <code>offsetSet</code>,
+это вопрос предпочтений.</p>
+<p>Метод проверяет, не является ли класс подключаемого компонента <code>final</code>. Если нет - создает наследника,
+заносит его имя в кеш (чтобы не уйти в рекурсию), и возвращает его имя.</p>
+<p>Важный момент - компонент собирается динамически, но мы не можем заранее предусмотреть,
+каким именно методы нам покажется необходимым переопределить в наследнике. Поэтому в метод сборки компонента
+передается внешний <em>делегат</em> - см. вызов <code>$this-&gt;options-&gt;getMethodDelegate()</code>. Делегат определяет методы,
+особым образом аннотирует их, и при вызове метода виртуального наследника вызов передается к делегату.
+Сделано это исключительно ради удобства и универсальности.</p>
+<h3 id="шаг-2-создание-прокси-наследника">Шаг 2: Создание прокси-наследника</h3>
+<p>Классы наследников будут создаваться динамически - это реализуемо благодаря функции <code>eval()</code>.
+Любой код, выполняемый интерпретатором из файла, может также быть выполнен в <code>eval()</code>, причем переданный код
+будет интерпретирован как содержимое отдельного PHP-файла, как если бы он подключился через <code>include</code> - это
+позволяет создавать runtime-классы в нужном нам пространстве имен
+(в данном случае аналогичном родителю, во избежание конфликтов).</p>
+<p>Основной момент (цитата из строки, которая в итоге будет передана в <code>eval</code>):</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php"><span style="color:#000;font-weight:bold">public</span> <span style="color:#000;font-weight:bold">function</span> __construct(<span style="color:#000;font-weight:bold">...</span>\<span style="color:#008080">$args</span>)
+{
+    <span style="color:#000;font-weight:bold">if</span> (method_exists(get_parent_class(\<span style="color:#008080">$this</span>), <span style="color:#d14">&#39;__construct&#39;</span>)) {
+        \<span style="color:#008080">$args</span> <span style="color:#000;font-weight:bold">=</span> {<span style="color:#008080">$this</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">getPreConstructInvocation</span>(<span style="color:#008080">$options</span>)} <span style="color:#000;font-weight:bold">?:</span> \<span style="color:#008080">$args</span>;
+
+        <span style="color:#000;font-weight:bold">parent</span><span style="color:#000;font-weight:bold">::</span><span style="color:#008080">__construct</span>(<span style="color:#000;font-weight:bold">...</span>\<span style="color:#008080">$args</span>);
+    }
+
+    {<span style="color:#008080">$this</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">getPostConstructInvocation</span>(<span style="color:#008080">$options</span>)}
+}
+</code></pre></div><p>Мы не можем куда-либо делегировать вызов конструктора, поэтому делегируем обработку аргументов.
+Результирующий масссив со всеми сервисами будет передан в родительский конструктор.</p>
+<p>Остальной код сборщика классов цитировать нет смысла, т.к. он достаточно прост.
+Полный текст класса <a href="https://github.com/whiskyjs/bx-mutagen/blob/develop/src/Core/Delegation/WrapperBuilder.php">доступен</a> на GitHub.</p>
+<h3 id="шаг-3-создание-контейнера-зависимостей">Шаг 3: Создание контейнера зависимостей</h3>
+<p>Существует несколько готовых реализаций, но для иллюстрации концепта оказалось проще и быстрее написать свою,
+намного более примитивную и ошибочную. Т.к. инстанс на момент перехвата уже существует,
+container()-&gt;make() и аналоги неприменимы, и необходим публичный метод разрешение значений аргументов класса:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php">   <span style="color:#000;font-weight:bold">public</span> <span style="color:#000;font-weight:bold">function</span> <span style="color:#900;font-weight:bold">resolveMethodArguments</span>(
+       string <span style="color:#008080">$class</span>,
+       <span style="color:#008080">$method</span>,
+       <span style="color:#000;font-weight:bold">array</span> <span style="color:#008080">$arguments</span>
+   )<span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">array</span> {
+      <span style="color:#000;font-weight:bold">return</span> <span style="color:#008080">$this</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">__resolveMethodArguments</span>(<span style="color:#008080">$class</span>, <span style="color:#008080">$method</span>, <span style="color:#008080">$arguments</span>);
+   }
+
+    <span style="color:#000;font-weight:bold">private</span> <span style="color:#000;font-weight:bold">function</span> <span style="color:#900;font-weight:bold">__resolveMethodArguments</span>(
+        string <span style="color:#008080">$class</span>,
+        <span style="color:#008080">$method</span>,
+        <span style="color:#000;font-weight:bold">array</span> <span style="color:#008080">$arguments</span>,
+        <span style="color:#000;font-weight:bold">array</span> <span style="color:#008080">$chain</span> <span style="color:#000;font-weight:bold">=</span> []
+    )<span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">array</span> {
+        <span style="color:#008080">$args</span> <span style="color:#000;font-weight:bold">=</span> [];
+
+        <span style="color:#000;font-weight:bold">if</span> (is_string(<span style="color:#008080">$method</span>)) {
+            <span style="color:#008080">$method</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">new</span> \ReflectionMethod(<span style="color:#008080">$class</span>, <span style="color:#008080">$method</span>);
+        }
+
+        <span style="color:#000;font-weight:bold">foreach</span> (<span style="color:#008080">$method</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">getParameters</span>() <span style="color:#000;font-weight:bold">as</span> <span style="color:#008080">$parameter</span>) {
+            <span style="color:#008080">$parameterType</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#008080">$parameter</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">getType</span>();
+            <span style="color:#008080">$parameterTypeName</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#008080">$parameterType</span> <span style="color:#000;font-weight:bold">?</span> <span style="color:#008080">$parameterType</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">getName</span>() <span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">null</span>;
+            <span style="color:#008080">$parameterValue</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">null</span>;
+
+            <span style="color:#000;font-weight:bold">if</span> (is_map(<span style="color:#008080">$arguments</span>) <span style="color:#000;font-weight:bold">&amp;&amp;</span> array_key_exists(<span style="color:#008080">$parameter</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">getName</span>(), <span style="color:#008080">$arguments</span>)) {
+                <span style="color:#008080">$parameterValue</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#008080">$arguments</span>[<span style="color:#008080">$parameter</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">getName</span>()];
+                unset(<span style="color:#008080">$arguments</span>[<span style="color:#008080">$parameter</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">getName</span>()]);
+            } <span style="color:#000;font-weight:bold">elseif</span> ((<span style="color:#008080">$arguments</span> <span style="color:#000;font-weight:bold">&amp;&amp;</span> <span style="color:#000;font-weight:bold">!</span><span style="color:#008080">$parameterTypeName</span>)
+                <span style="color:#000;font-weight:bold">||</span> (<span style="color:#008080">$parameterTypeName</span> <span style="color:#000;font-weight:bold">===</span> get_class(<span style="color:#008080">$arguments</span>[<span style="color:#099">0</span>] <span style="color:#000;font-weight:bold">??</span> <span style="color:#000;font-weight:bold">null</span>))
+            ) {
+                <span style="color:#000;font-weight:bold">if</span> (<span style="color:#008080">$parameter</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">isVariadic</span>()) {
+                    <span style="color:#008080">$parameterValue</span> <span style="color:#000;font-weight:bold">=</span> array_splice(<span style="color:#008080">$arguments</span>, <span style="color:#099">0</span>);
+                } <span style="color:#000;font-weight:bold">else</span> {
+                    <span style="color:#008080">$parameterValue</span> <span style="color:#000;font-weight:bold">=</span> array_shift(<span style="color:#008080">$arguments</span>);
+                }
+            } <span style="color:#000;font-weight:bold">elseif</span> (<span style="color:#008080">$parameterTypeName</span>) {
+                <span style="color:#000;font-weight:bold">if</span> (<span style="color:#008080">$class</span> <span style="color:#000;font-weight:bold">===</span> <span style="color:#008080">$parameterTypeName</span>) {
+                    <span style="color:#998;font-style:italic">// Класс не может требовать экземпляр самого себя в конструкторе
+</span><span style="color:#998;font-style:italic"></span>                    <span style="color:#000;font-weight:bold">throw</span> <span style="color:#000;font-weight:bold">new</span> ResolutionError(
+                        <span style="color:#d14">&#34;Невозможно разрешить зависимость: циклическая зависимость.&#34;</span>
+                    );
+                }
+
+                <span style="color:#008080">$parameterValue</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#008080">$this</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">__make</span>(
+                    <span style="color:#008080">$parameterTypeName</span>,
+                    [],
+                    array_merge(<span style="color:#008080">$chain</span>, [<span style="color:#008080">$class</span>])
+                );
+            } <span style="color:#000;font-weight:bold">elseif</span> (<span style="color:#008080">$parameter</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">isDefaultValueAvailable</span>()) {
+                <span style="color:#008080">$parameterValue</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#008080">$parameter</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">getDefaultValue</span>();
+            }
+
+            <span style="color:#000;font-weight:bold">if</span> (<span style="color:#008080">$parameter</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">isVariadic</span>()) {
+                <span style="color:#008080">$args</span> <span style="color:#000;font-weight:bold">=</span> array_merge(<span style="color:#008080">$args</span>, <span style="color:#008080">$parameterValue</span>);
+            } <span style="color:#000;font-weight:bold">else</span> {
+                <span style="color:#008080">$args</span>[] <span style="color:#000;font-weight:bold">=</span> <span style="color:#008080">$parameterValue</span>;
+            }
+        }
+
+        <span style="color:#000;font-weight:bold">return</span> <span style="color:#008080">$args</span>;
+    }
+</code></pre></div><h3 id="шаг-4-тесты">Шаг 4: Тесты</h3>
+<ol>
+<li>
+<p>Класс сервиса:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php"><span style="color:#000;font-weight:bold">class</span> <span style="color:#458;font-weight:bold">SomeService</span>
+{
+    <span style="color:#000;font-weight:bold">public</span> <span style="color:#000;font-weight:bold">function</span> <span style="color:#900;font-weight:bold">foo</span>()<span style="color:#000;font-weight:bold">:</span> string
+    {
+        <span style="color:#000;font-weight:bold">return</span> <span style="color:#d14">&#34;bar&#34;</span>;
+    }
+}
+</code></pre></div></li>
+<li>
+<p>Binding в контейнер:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php">container()<span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">singleton</span>(SomeService<span style="color:#000;font-weight:bold">::</span><span style="color:#008080">class</span>, <span style="color:#000;font-weight:bold">function</span> () {
+    <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">new</span> SomeService();
+});
+</code></pre></div></li>
+<li>
+<p>Подключение перехватчика компонентов:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php"> <span style="color:#000;font-weight:bold">class</span> <span style="color:#458;font-weight:bold">DIDelegate</span> <span style="color:#000;font-weight:bold">extends</span> Delegate
+ {
+     <span style="color:#d14">/**
+</span><span style="color:#d14">      * @bx-delegate
+</span><span style="color:#d14">      * @param DelegationOrigin $origin
+</span><span style="color:#d14">      * @param $arParams
+</span><span style="color:#d14">      * @return mixed
+</span><span style="color:#d14">      */</span>
+     <span style="color:#000;font-weight:bold">public</span> <span style="color:#000;font-weight:bold">function</span> <span style="color:#900;font-weight:bold">preConstruct</span>(<span style="color:#008080">$origin</span>, <span style="color:#000;font-weight:bold">...</span><span style="color:#008080">$args</span>)<span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">array</span>
+     {
+        <span style="color:#998;font-style:italic">// apply() === invoke_internal() без необходимости указывать объект
+</span><span style="color:#998;font-style:italic"></span>         <span style="color:#000;font-weight:bold">return</span> <span style="color:#008080">$origin</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">apply</span>(<span style="color:#000;font-weight:bold">function</span> () <span style="color:#000;font-weight:bold">use</span> (<span style="color:#008080">$args</span>) {
+             <span style="color:#000;font-weight:bold">return</span> container()<span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">resolveMethodArguments</span>(
+                get_parent_class(<span style="color:#008080">$this</span>), <span style="color:#d14">&#34;__construct&#34;</span>, <span style="color:#008080">$args</span>
+             );
+         });
+     }
+
+     <span style="color:#d14">/**
+</span><span style="color:#d14">      * @bx-delegate
+</span><span style="color:#d14">      * @param $arParams
+</span><span style="color:#d14">      * @return void
+</span><span style="color:#d14">      */</span>
+     <span style="color:#000;font-weight:bold">public</span> <span style="color:#000;font-weight:bold">function</span> <span style="color:#900;font-weight:bold">postConstruct</span>(<span style="color:#008080">$origin</span>, <span style="color:#000;font-weight:bold">...</span><span style="color:#008080">$args</span>)
+     {
+     }
+ }
+
+ <span style="color:#008080">$myDelegate</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">new</span> DIDelegate();
+
+ <span style="color:#008080">$options</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">new</span> ComponentInterceptorOptions(<span style="color:#008080">$myDelegate</span>);
+ <span style="color:#008080">$interceptor</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">new</span> ComponentInterceptorPlugin(<span style="color:#008080">$options</span>);
+ <span style="color:#008080">$interceptor</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">plugIn</span>();
+</code></pre></div></li>
+<li>
+<p>Компонент:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php"><span style="color:#000;font-weight:bold">class</span> <span style="color:#458;font-weight:bold">SubscribeFormComponent</span> <span style="color:#000;font-weight:bold">extends</span> RestComponent
+{
+    <span style="color:#000;font-weight:bold">public</span> <span style="color:#000;font-weight:bold">function</span> __construct(
+        <span style="color:#000;font-weight:bold">?</span>\CBitrixComponent <span style="color:#008080">$component</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">null</span>,
+        <span style="color:#000;font-weight:bold">?</span>\SomeService <span style="color:#008080">$service</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">null</span>
+    ) {
+        <span style="color:#000;font-weight:bold">parent</span><span style="color:#000;font-weight:bold">::</span><span style="color:#008080">__construct</span>(<span style="color:#008080">$component</span>);
+
+        <span style="color:#008080">$value</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#008080">$service</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">foo</span>(); <span style="color:#998;font-style:italic">// &#34;bar&#34;
+</span><span style="color:#998;font-style:italic"></span>    }
+}
+</code></pre></div></li>
+</ol>
+<h2 id="итоги">Итоги</h2>
+<ul>
+<li>
+<p>Программисты на Laravel грустны и подавлены, и это мы еще только начали.
+В следующей статье - сборка своего Artisan, с динамическим набором команд и скрытием пространств имен.</p>
+</li>
+<li>
+<p>Даже если все говорят, что что-то невозможно в принципе, иногда оно всё-таки возможно - и обычно попытка стоит того,
+даже если на выходе получается всего лишь забавная статья в блог.</p>
+</li>
+</ul>
+<h2 id="ссылки">Ссылки</h2>
+<p>Composer-пакет bx-mutagen, реализующий функционал перехвата компонентов:</p>
+<p><a href="https://github.com/whiskyjs/bx-mutagen">https://github.com/whiskyjs/bx-mutagen</a></p>
+</div>
+  <footer class="post-footer">
+  </footer>
+</article>
+    </main><footer class="footer">
+    <span>&copy; 2020 <a href="https://machaon-dev.github.io/blog/">Machaon.Dev blog</a></span>
+    <span>&middot;</span>
+    <span>Powered by <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a></span>
+    <span>&middot;</span>
+    <span>Theme <a href="https://git.io/hugopapermod" rel="noopener" target="_blank">PaperMod</a></span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top" accesskey="g">
+    <button class="top-link" id="top-link" type="button">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6">
+            <path d="M12 6H0l6-6z" /></svg>
+    </button>
+</a>
+
+
+<script>
+    window.onload = function () {
+        if (localStorage.getItem("menu-scroll-position")) {
+            document.getElementById('menu').scrollLeft = localStorage.getItem("menu-scroll-position");
+        }
+    }
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            document.querySelector(`[id='${id}']`).scrollIntoView({
+                behavior: "smooth"
+            });
+        });
+    });
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+    function menu_on_scroll() {
+        localStorage.setItem("menu-scroll-position", document.getElementById('menu').scrollLeft);
+    }
+</script>
+<script>
+    localStorage.removeItem("pref-theme");
+</script>
+
+</body>
+
+</html>

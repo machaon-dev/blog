@@ -1,0 +1,19 @@
+baseURL = "https://machaon-dev.github.io/blog/"
+languageCode = "ru-ru"
+defaultContentLanguage = "ru"
+title = "Machaon.Dev blog"
+theme = "hugo-PaperMod"
+enableEmoji = true
+publishDir = "docs"
+
+[params]
+description = "Делимся полезным."
+author = "Eugene Zadorin"
+disableThemeToggle = true
+#[params.homeInfoParams]
+#Title = "Hello there 👽"
+#Content = "Can be [Info](/test), links, about..."
+
+[markup]
+  [markup.highlight]
+    style = "github"
