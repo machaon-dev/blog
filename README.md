@@ -1,6 +1,8 @@
 # Machaon.Dev blog
 
-Сделано на базе static site generator [Hugo](https://gohugo.io/)
+[https://machaon-dev.github.io/blog/](https://machaon-dev.github.io/blog/)
+
+Сделано на базе [Hugo static site generator](https://gohugo.io/)
 
 ## Установка
 
