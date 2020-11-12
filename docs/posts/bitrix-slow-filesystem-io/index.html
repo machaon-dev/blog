@@ -5,12 +5,12 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-<title>Machaon.Dev blog</title>
+<title>Quick tip: что делать, если Битрикс показывает низкую скорость файловых операций - Machaon.Dev blog</title>
 
 <meta name="keywords" content="" />
-<meta name="description" content="Делимся полезным.">
+<meta name="description" content="Если проседает производительность конфигурации, или не работает сканер безопасности, проверьте open_basedir">
 <meta name="author" content="Eugene Zadorin">
-<link rel="canonical" href="https://machaon-dev.github.io/blog/" />
+<link rel="canonical" href="https://machaon-dev.github.io/blog/posts/bitrix-slow-filesystem-io/" />
 <link href="https://machaon-dev.github.io/blog/assets/css/stylesheet.min.5f7d0b69564952927bd9abb7b81b216c6c98e8781c491fd48bffb8c7c130b26f.css" integrity="sha256-X30LaVZJUpJ72au3uBshbGyY6HgcSR/Ui/&#43;4x8Ewsm8=" rel="preload stylesheet"
     as="style">
 <link rel="manifest" href="https://machaon-dev.github.io/blog/site.webmanifest">
@@ -22,14 +22,13 @@
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
 <meta name="generator" content="Hugo 0.78.1" />
-<link rel="alternate" type="application/rss&#43;xml" href="https://machaon-dev.github.io/blog/index.xml">
 
 
 
 
 </head>
 
-<body class="list home" id="top">
+<body class="single" id="top">
 <noscript>
     <style type="text/css">
         .theme-toggle,
@@ -51,59 +50,37 @@
     </nav>
 </header>
 
-    <main class="main"> 
+    <main class="main">
 
-
-
-<article class="first-entry"> 
-
-  <header class="entry-header">
-    <h2>
+<article class="post-single">
+  <header class="post-header">
+    <h1 class="post-title">
       Quick tip: что делать, если Битрикс показывает низкую скорость файловых операций
-    </h2>
-  </header>
-  <section class="entry-content">
-    <p>Если проседает производительность конфигурации, или не работает сканер безопасности, проверьте open_basedir</p>
-  </section>
-  <footer class="entry-footer">
+    </h1>
+    <div class="post-meta">
 
 November 12, 2020&nbsp;·&nbsp;Eugene Zadorin
-</footer>
-  <a class="entry-link" aria-label="post link to Quick tip: что делать, если Битрикс показывает низкую скорость файловых операций" href="https://machaon-dev.github.io/blog/posts/bitrix-slow-filesystem-io/"></a>
+
+    </div>
+  </header> 
+
+  <div class="post-content"><p>У CMS 1C-Bitrix есть панель производительности, которая определяет некий индекс производительности вашего сервера. Одним из параметров, которые влияют на этот индекс, является количество файловых операций в секунду.</p>
+<p>Иногда этот параметр может сильно проседать по сравнению с эталонным:</p>
+<p><img src="/blog/img/U92QCdP.png" alt="Bitrix Slow File IO"></p>
+<p>Из-за медленных файловых операций может также отказаться работать сканер безопасности:</p>
+<p><img src="/blog/img/Nd8uIRo.png" alt="Bitrix Security Scanner"></p>
+<p>Первая мысль — тормозит жесткий диск. Это можно проверить, например, утилитой <a href="https://github.com/axboe/fio">fio</a>.</p>
+<p>Но что делать, если системная утилита показывает нормальную скорость файловых операций?</p>
+<p>Проблема может быть связана с неправильно установленным php-параметром <a href="https://www.php.net/manual/ru/ini.core.php#ini.open-basedir">open_basedir</a>. В документации есть такая фраза:</p>
+<blockquote>
+<p>Использование опции open_basedir установит realpath_cache_size на значение 0 и таким образом отключит кеш realpath.</p>
+</blockquote>
+<p>Предположительно, из-за этого Битрикс и рекомендует отключать эту директиву.</p>
+<p>В нашем случае её отключение увеличило скорость файловых операций в 2 раза.</p>
+</div>
+  <footer class="post-footer">
+  </footer>
 </article>
-<article class="post-entry"> 
-
-  <header class="entry-header">
-    <h2>
-      БУС и инъекция зависимостей в классовые компоненты
-    </h2>
-  </header>
-  <section class="entry-content">
-    <p>В 2020 году будет тратой времени объяснять, что такое dependency injection и какую пользу построение ядра вокруг контейнера зависимостей приносит современному PHP-проекту. Программистам, полноценно работающим с платформой 1С-Битрикc, дополнительно нет смысла рассказывать, какой процент стандартных модулей платформы этот паттерн применяет (на всякий случай - ноль, нет его там в принципе). Но, несмотря на то, что нет - хочется. А если хочется, то стоит попробовать, независимо от того, что получится в итоге.</p>
-  </section>
-  <footer class="entry-footer">
-
-November 5, 2020&nbsp;·&nbsp;Александр Селюченко
-</footer>
-  <a class="entry-link" aria-label="post link to БУС и инъекция зависимостей в классовые компоненты" href="https://machaon-dev.github.io/blog/posts/bitrix-di-in-class-components/"></a>
-</article>
-<article class="post-entry"> 
-
-  <header class="entry-header">
-    <h2>
-      Going remote: советы самому себе перед вторым локдауном
-    </h2>
-  </header>
-  <section class="entry-content">
-    <p>2020 год определенно запомнится нам надолго, в том числе благодаря всеобщей вынужденной удаленке. Для многих компаний это стало настоящим испытанием, но мы выдержали его достойно. Впереди (не точно) карантин №2 — самое время обдумать и записать, как жить и работать в новой реальности</p>
-  </section>
-  <footer class="entry-footer">
-
-October 30, 2020&nbsp;·&nbsp;Eugene Zadorin
-</footer>
-  <a class="entry-link" aria-label="post link to Going remote: советы самому себе перед вторым локдауном" href="https://machaon-dev.github.io/blog/posts/going-remote/"></a>
-</article>
-
     </main><footer class="footer">
     <span>&copy; 2020 <a href="https://machaon-dev.github.io/blog/">Machaon.Dev blog</a></span>
     <span>&middot;</span>

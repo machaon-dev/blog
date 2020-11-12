@@ -6,7 +6,16 @@
     <description>Recent content on Machaon.Dev blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ru-ru</language>
-    <lastBuildDate>Thu, 05 Nov 2020 12:00:00 +0300</lastBuildDate><atom:link href="https://machaon-dev.github.io/blog/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 12 Nov 2020 18:00:00 +0300</lastBuildDate><atom:link href="https://machaon-dev.github.io/blog/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Quick tip: что делать, если Битрикс показывает низкую скорость файловых операций</title>
+      <link>https://machaon-dev.github.io/blog/posts/bitrix-slow-filesystem-io/</link>
+      <pubDate>Thu, 12 Nov 2020 18:00:00 +0300</pubDate>
+      
+      <guid>https://machaon-dev.github.io/blog/posts/bitrix-slow-filesystem-io/</guid>
+      <description>Если проседает производительность конфигурации, или не работает сканер безопасности, проверьте open_basedir</description>
+    </item>
+    
     <item>
       <title>БУС и инъекция зависимостей в классовые компоненты</title>
       <link>https://machaon-dev.github.io/blog/posts/bitrix-di-in-class-components/</link>
