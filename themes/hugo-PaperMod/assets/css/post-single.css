@@ -17,6 +17,10 @@
     flex-wrap: wrap;
 }
 
+.post-single .post-meta {
+    margin-top: 5px;
+}
+
 .post-meta .i18n_list li {
     display: inline-flex;
     list-style: none;

@@ -1,7 +1,7 @@
 {{- $scratch := newScratch}}
 
 {{- if not .Date.IsZero -}}
-{{- $scratch.Add "meta" (slice (.Date.Format (default "January 2, 2006" .Site.Params.DateFormat))) }}
+{{- $scratch.Add "meta" (slice (printf "%d %s %d" .Date.Day (index $.Site.Data.months.months .Date.Month) .Date.Year)) }}
 {{- end -}}
 
 {{- if $.Site.Params.ShowReadingTime -}}

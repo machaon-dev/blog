@@ -1,7 +1,7 @@
 baseURL = "https://machaon-dev.github.io/blog/"
 languageCode = "ru-ru"
 defaultContentLanguage = "ru"
-title = "Machaon.Dev blog"
+title = "Machaon.Dev"
 theme = "hugo-PaperMod"
 enableEmoji = true
 publishDir = "docs"
