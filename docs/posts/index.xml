@@ -6,7 +6,16 @@
     <description>Recent content in Posts on Machaon.Dev</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ru-ru</language>
-    <lastBuildDate>Thu, 12 Nov 2020 18:00:00 +0300</lastBuildDate><atom:link href="https://machaon-dev.github.io/blog/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 17 Nov 2020 16:00:00 +0300</lastBuildDate><atom:link href="https://machaon-dev.github.io/blog/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Проблемы ссылок mailto и что с этим делать</title>
+      <link>https://machaon-dev.github.io/blog/posts/trouble-with-mailto-links/</link>
+      <pubDate>Tue, 17 Nov 2020 16:00:00 +0300</pubDate>
+      
+      <guid>https://machaon-dev.github.io/blog/posts/trouble-with-mailto-links/</guid>
+      <description>Несмотря на широкое использование таких ссылок на сайтах, они имеют ряд проблем. Во-первых, из такой ссылки трудно скопировать адрес, если пользователь захочет с кем-нибудь им поделиться. Во-вторых, у некоторых пользователей установлено более одной почтовой программы, и клик по ссылке запустит дефолтную, не давая возможность выбора. И наконец, у многих пользователей почтовое приложение вообще не установлено, и такая ссылка просто заведет их в тупик. &lt;br&gt; В итоге, первое, что приходит в голову - размещение на сайте адреса электронной почты как обычного текста, а не ссылки. Но такое решение имеет свои недостатки.</description>
+    </item>
+    
     <item>
       <title>Quick tip: что делать, если Битрикс показывает низкую скорость файловых операций</title>
       <link>https://machaon-dev.github.io/blog/posts/bitrix-slow-filesystem-io/</link>

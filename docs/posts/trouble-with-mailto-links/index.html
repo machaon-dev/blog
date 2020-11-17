@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ru" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<title>Проблемы ссылок mailto и что с этим делать - Machaon.Dev</title>
+
+<meta name="keywords" content="" />
+<meta name="description" content="Несмотря на широкое использование таких ссылок на сайтах, они имеют ряд проблем. Во-первых, из такой ссылки трудно скопировать адрес, если пользователь захочет с кем-нибудь им поделиться. Во-вторых, у некоторых пользователей установлено более одной почтовой программы, и клик по ссылке запустит дефолтную, не давая возможность выбора. И наконец, у многих пользователей почтовое приложение вообще не установлено, и такая ссылка просто заведет их в тупик. В итоге, первое, что приходит в голову - размещение на сайте адреса электронной почты как обычного текста, а не ссылки. Но такое решение имеет свои недостатки.">
+<meta name="author" content="Константин Лихачев">
+<link rel="canonical" href="https://machaon-dev.github.io/blog/posts/trouble-with-mailto-links/" />
+<link href="https://machaon-dev.github.io/blog/assets/css/stylesheet.min.bcea0e63ad1190adaad58635af831e12a59dcbb3b1f45507edc570bd7244a2be.css" integrity="sha256-vOoOY60RkK2q1YY1r4MeEqWdy7Ox9FUH7cVwvXJEor4=" rel="preload stylesheet"
+    as="style">
+<link rel="manifest" href="https://machaon-dev.github.io/blog/site.webmanifest">
+<link rel="icon" href="https://machaon-dev.github.io/blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://machaon-dev.github.io/blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://machaon-dev.github.io/blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://machaon-dev.github.io/blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://machaon-dev.github.io/blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<meta name="generator" content="Hugo 0.78.2" />
+
+
+
+
+</head>
+
+<body class="single" id="top">
+<noscript>
+    <style type="text/css">
+        .theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+</noscript>
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://machaon-dev.github.io/blog/" accesskey="h">Machaon.Dev</a>
+            <span class="logo-switches">
+                
+            </span>
+        </div>
+        <ul class="menu" id="menu" onscroll="menu_on_scroll()"></ul>
+    </nav>
+</header>
+
+    <main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <h1 class="post-title">
+      Проблемы ссылок mailto и что с этим делать
+    </h1>
+    <div class="post-meta">
+
+17 ноября 2020&nbsp;·&nbsp;Константин Лихачев
+
+    </div>
+  </header> 
+
+  <div class="post-content"><blockquote>
+<p>Эта статья изначально была написана <a href="https://k.likhachev.site/blog/webdev/mailto/">в личном блоге автора</a></p>
+</blockquote>
+<p>Несмотря на широкое использование таких ссылок на сайтах, они имеют ряд проблем.</p>
+<p><strong>Во-первых</strong>, из такой ссылки трудно скопировать адрес, если пользователь захочет с кем-нибудь им поделиться.</p>
+<p><strong>Во-вторых</strong>, у некоторых пользователей установлено более одной почтовой программы, и клик по ссылке запустит дефолтную, не давая возможность выбора.</p>
+<p><strong>И наконец</strong>, у многих пользователей почтовое приложение вообще не установлено, и такая ссылка просто заведет их в тупик.</p>
+<p>Например, если кликнуть по ссылке mailto в Хроме на Макбуке без настроенного почтового клиента, MacOs запустит стандартное приложение Почта с диалоговым окном настройки аккаунта почты. И если вы используете, скажем, Gmail, настроить его запуск в Chrome - нетривиальная задача (<a href="https://support.google.com/a/users/answer/9308783?hl=ru">как это сделать</a>).</p>
+<p>В итоге, первое, что приходит в голову - размещение на сайте адреса электронной почты как обычного текста, а не ссылки.</p>
+<p>Но такое решение имеет свои недостатки.</p>
+<h2 id="плюсы-ссылок-mailto">Плюсы ссылок mailto</h2>
+<p>Почему решение отказаться от mailto ссылок не выглядит идеальным:</p>
+<ul>
+<li>такие ссылки широко используются, и люди ожидают привычного им поведения;</li>
+<li>на мобильных устройствах пользователям чаще всего приходится настраивать почтовый клиент, поэтому клик по mailto делает именно то, что они ожидают - открывает окно создания нового письма.</li>
+</ul>
+<p>Тем не менее такая ссылка все еще будет неудобна для тех, кто хочет скопировать адрес электронной почты и добавить его в заметку или отправить контакту.</p>
+<h2 id="предлагая-выбор">Предлагая выбор</h2>
+<p>Понимая, что свои плюсы и минусы есть у обоих вариантов: адреса e-mail как ссылки и как обычного текста, разумным будет предложить пользователю выбор.</p>
+<p>Например, разместить ссылку «Напишите нам», а рядом адрес электронной почты в виде текста.</p>
+<h2 id="наводим-порядок-с-помощью-кнопки-копировать">Наводим порядок с помощью кнопки «Копировать»</h2>
+<p>Решение выше было бы отличным, если б не одно «но». Ссылки mailto настолько широко распространены, что некоторые пользователи все же ожидают, что смогут кликнуть или тапнуть по адресу электронной почты.</p>
+<p>Поэтому разумным было бы вернуть mailto-ссылку адресу электронной почты, добавив рядом кнопку “копировать адрес”, которая позволяла бы пользователям скопировать адрес электронной почты в буфер обмена.</p>
+<p>А уже из него они могли бы использовать адрес для написания нового письма в своем почтовом клиенте, добавить его в заметки или поделиться с другими пользователями.</p>
+<p>Однако такой подход решает только одну из трех обозначенных выше проблем: сложность с копированием адреса электронной почты.</p>
+<p>Пользователи, кликнувшие по ссылки все еще:</p>
+<ul>
+<li>будут попадать в тупик, если у них не настроен почтовый клиент</li>
+<li>не смогут выбрать почтовое приложение для создания письма, если используют более одного</li>
+</ul>
+<h2 id="что-же-делать">Что же делать?</h2>
+<p>Это настолько распространенная проблема, что браузеры и операционные системы должны приложить руку к ее решению.</p>
+<p>По-настоящему идеальным решением стало бы меню, появляющиеся при клике по ссылке mailto с такими пунктами:</p>
+<ol>
+<li>Написать через Gmail</li>
+<li>Написать с другого аккаунта</li>
+<li>Копировать адрес</li>
+<li>Поделиться адресом…</li>
+</ol>
+<p>Такое решение удовлетворило бы потребности большинства пользователей.</p>
+<p>Это перевод статьи <a href="https://adamsilver.io/articles/the-trouble-with-mailto-email-links-and-what-to-do-instead/">The trouble with mailto email links and what to do instead</a></p>
+</div>
+  <footer class="post-footer">
+  </footer>
+</article>
+    </main><footer class="footer">
+    <span>&copy; 2020 <a href="https://machaon-dev.github.io/blog/">Machaon.Dev</a></span>
+    <span>&middot;</span>
+    <span>Сделано на <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a></span>
+    <span>&middot;</span>
+    <span>Тема <a href="https://git.io/hugopapermod" rel="noopener" target="_blank">PaperMod</a></span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top" accesskey="g">
+    <button class="top-link" id="top-link" type="button">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6">
+            <path d="M12 6H0l6-6z" /></svg>
+    </button>
+</a>
+
+<script type="text/javascript" >
+   (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+   m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+   (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+   ym(69199438, "init", {
+        clickmap:true,
+        trackLinks:true,
+        accurateTrackBounce:true,
+        webvisor:true
+   });
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/69199438" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+
+<script>
+    window.onload = function () {
+        if (localStorage.getItem("menu-scroll-position")) {
+            document.getElementById('menu').scrollLeft = localStorage.getItem("menu-scroll-position");
+        }
+    }
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            document.querySelector(`[id='${id}']`).scrollIntoView({
+                behavior: "smooth"
+            });
+        });
+    });
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+    function menu_on_scroll() {
+        localStorage.setItem("menu-scroll-position", document.getElementById('menu').scrollLeft);
+    }
+</script>
+<script>
+    localStorage.removeItem("pref-theme");
+</script>
+
+</body>
+
+</html>
