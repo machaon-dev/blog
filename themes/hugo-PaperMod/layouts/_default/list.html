@@ -40,7 +40,7 @@
   </header>
   {{- if (ne .Site.Params.hideSummary true)}}
   <section class="entry-content">
-    <p>{{ .Summary | plainify | htmlUnescape }}</p>
+    <p>{{ .Summary }}</p>
   </section>
   {{- end }}
   <footer class="entry-footer">
