@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ru" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<title>Пять способов улучшить читабельность кода - Machaon.Dev</title>
+
+<meta name="keywords" content="" />
+<meta name="description" content="Пять способов улучшить читабельность кода">
+<meta name="author" content="Константин Лихачев">
+<link rel="canonical" href="https://machaon-dev.github.io/blog/posts/on-code-readability/" />
+<link href="https://machaon-dev.github.io/blog/assets/css/stylesheet.min.bcea0e63ad1190adaad58635af831e12a59dcbb3b1f45507edc570bd7244a2be.css" integrity="sha256-vOoOY60RkK2q1YY1r4MeEqWdy7Ox9FUH7cVwvXJEor4=" rel="preload stylesheet"
+    as="style">
+<link rel="manifest" href="https://machaon-dev.github.io/blog/site.webmanifest">
+<link rel="icon" href="https://machaon-dev.github.io/blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://machaon-dev.github.io/blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://machaon-dev.github.io/blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://machaon-dev.github.io/blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://machaon-dev.github.io/blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<meta name="generator" content="Hugo 0.78.2" />
+
+
+
+
+</head>
+
+<body class="single" id="top">
+<noscript>
+    <style type="text/css">
+        .theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+</noscript>
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://machaon-dev.github.io/blog/" accesskey="h">Machaon.Dev</a>
+            <span class="logo-switches">
+                
+            </span>
+        </div>
+        <ul class="menu" id="menu" onscroll="menu_on_scroll()"></ul>
+    </nav>
+</header>
+
+    <main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <h1 class="post-title">
+      Пять способов улучшить читабельность кода
+    </h1>
+    <div class="post-meta">
+
+18 ноября 2020&nbsp;·&nbsp;Константин Лихачев
+
+    </div>
+  </header> 
+
+  <div class="post-content"><blockquote>
+<p>Эта статья изначально была написана <a href="https://k.likhachev.site/blog/post/readability/">в личном блоге автора</a></p>
+</blockquote>
+<h2 id="tldr">TL;DR</h2>
+<p>Для тех, кто ищет быстрые ответы, не желая читать весь текст, вот краткое содержание:</p>
+<ul>
+<li>Повторно используйте код, который повторяется более одного раза.</li>
+<li>Читабельность и простота поддержки важнее универсальности.</li>
+<li>Делайте модули, классы и компоненты как можно меньше.</li>
+<li>Используйте правила и стандарты для кода.</li>
+<li>Пишите код, как будто вы в команде, даже если работаете один.</li>
+</ul>
+<h2 id="повторно-используйте-код-который-повторяется-более-одного-раза">Повторно используйте код, который повторяется более одного раза</h2>
+<p>Большинство разработчиков знакомы с принципом DRY (Don’t Repeat Yourself). Он позволяет избежать дублирования кода.</p>
+<p>Зачем писать функцию снова и снова? Напишите ее один раз и используйте в нескольких местах. И, когда вам понадобится изменить этот кусок кода, сделать это придется только в одном месте, не занимаясь копипастой багфикса в кучу мест.</p>
+<p>Но имейте в виду, что использование принципа DRY увеличивает сложность кода, потому что, в конце концов, количество повторно используемого кода будет расти.</p>
+<p>А про важность написания тестов при повторном использовании частей кода вы узнаете, когда вы начнете изменять этот код.</p>
+<h2 id="читабельность-и-простота-поддержки-важнее-универсальности">Читабельность и простота поддержки важнее универсальности</h2>
+<p>Повторное использование, читабельность, и простота поддержки друзья и враги одновременно.</p>
+<p>Когда вы начинаете придерживаться принципа DRY, сложность вашего кода начинает расти. Когда растет сложность - страдает читабельность.</p>
+<p>Поэтому не начинайте написание кода с громоздких универсальных решений. Начинайте с простых! Не надо пытаться сделать идеально с первого раза.</p>
+<p>Используя итеративный подход, вы сможете повторно использовать некоторые части своего кода, сохраняя при этом его читабельность и простоту поддержки.</p>
+<p>Когда вы работаете в компании с несколькими командами разработчиков, в вашей команде скорее всего будут еще и внешние исполнители (фрилансеры или консультанты). Таким людям, как правило, приходится намного чаще переключаться с одного проекта на другой.</p>
+<p>В этом случае, читабельность кода и простота его поддержки - ключ к успеху проекта. Громоздкий непонятный код, написанный человеком, который может покинуть команду в любой момент - не самое лучшее решение.</p>
+<p>Правда иногда вам могут требоваться именно такие решения, но помните, что важно сделать их код как можно более читабельным и простым в поддержке.</p>
+<h2 id="делайте-модули-классы-и-компоненты-как-можно-меньше">Делайте модули, классы и компоненты как можно меньше</h2>
+<p>Разрабатывая новые функции для проекта, вы, скорее всего, стараетесь тщательно их продумать.</p>
+<p>Помните, что лучшие решения — это те, которые можно разделить на небольшие модули, классы или компоненты. А знаете почему?</p>
+<p>Маленькие куски кода проще тестировать и поддерживать.</p>
+<p>Вспомните, что дома строятся путем перемещения более мелких компонентов в нужное место, и никто не пытается сначала построить дом, а потом переместить его туда, где он должен находиться. Хотя, конечно, бывают и исключения.</p>
+<p>Большинство современных библиотек и фреймворков разбиты на маленькие строительных блоки, а не представлены в виде одного файла. JavaScript библиотеки и фреймворки такие, как Angular, React и Vue используют концепцию компонентов. Вряд ли они делают это случайно.</p>
+<h2 id="используйте-правила-и-стандарты-для-кода">Используйте правила и стандарты для кода</h2>
+<p>Одна из составляющих написания читабельного и легко поддерживаемого кода - его архитектура. Другая - его стиль.</p>
+<p>Я думаю, любому из вас хорошо известны эти бесконечные споры о том, что лучше использовать для выравнивания: табы или пробелы. Не хочу занимать ни чью сторону в этом споре, ведь на самом деле не важно, что использует ваша команда. Гораздо важнее, что это каждый член команды понимает и принимает эти правила.</p>
+<p>И лучшим решением в данной ситуации будет автоматическое форматирования кода. Большинство IDE имеют для этого встроенные или устанавливаемые в виде плагинов инструменты.</p>
+<p>Самый простой из таких инструментов, подходящий для большинства языков программирования и редакторов — editorconfig. Вы можете применять правила форматирования кода просто добавляя файл <code>.editorconfig</code> в свой проект.</p>
+<p>В этот файл можно добавить различные настройки форматирования, как глобальные, так и специфичные для конкретного языка программирования. Например:</p>
+<ul>
+<li>Использование табов или пробелов для отступов</li>
+<li>Тип кавычек: двойные или одинарные</li>
+<li>Максимальную длину строки</li>
+<li>Набор символов</li>
+<li>и т.д.</li>
+</ul>
+<p>Вот пример такого файла:</p>
+<pre><code>root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_size = 4
+indent_style = tab
+insert_final_newline = false
+max_line_length = 120
+tab_width = 4
+
+[*.md]
+max_line_length = off
+trim_trailing_whitespace = false
+</code></pre>
+<p>Подробнее про формат файла можно почитать на <a href="https://editorconfig.org/">editorconfig.org</a></p>
+<p>Кроме того, существуют более специализированные решения для конкретных языков программирования. Например, Prettier для JavaScript. Возможно, вы используете что-то другое. На самом деле не важно какие инструменты используются в вашей команде, самое главное — это использование единых правил и стандартов.</p>
+<h2 id="пишите-код-как-будто-вы-в-команде-даже-если-работаете-один">Пишите код, как будто вы в команде, даже если работаете один</h2>
+<p>Последний, но не менее важный пункт: пишите, как будто вы в команде!</p>
+<p>Я могу представить, что людям, которые никогда не писали код в команде, очень трудно понять каково это.</p>
+<p>Но если вы пишите проект в одиночку, есть большой соблазн начать писать код, который поймете только вы (например, использовать непонятные имена переменных или имена из 2–3 символов и т.д.).</p>
+<p>Вместо этого попробуйте писать так, как будто вы в команде. Представьте, что ваш код настолько понятен, что кто-то другой сможет без труда в нем разобраться.</p>
+<p>Вы можете легко проверить это, попросив друга или кого-нибудь из сообщества разработчиков проверить читабельность вашего кода. Обещаю, что вы получите такую обратную связь, о которой не могли и подумать.</p>
+<p>Не паникуйте из-за негативного фидбека! Сфокусируйтесь на отзывах, которые сделают ваш код более читабельным.</p>
+<p>Запомните, что грань между хорошо читаемым и плохо читаемым кодом очень тонка. И чаще всего субъективна.</p>
+<p>Не расстраивайтесь, если кто-то скажет, что ваш код не читаем! Вместо этого поблагодарите человека за обратную связь.</p>
+<p>Это перевод статьи <a href="https://medium.com/better-programming/5-rules-to-improve-code-readability-83eda50ca780">5 Rules to Improve Code Readability</a></p>
+</div>
+  <footer class="post-footer">
+  </footer>
+</article>
+    </main><footer class="footer">
+    <span>&copy; 2020 <a href="https://machaon-dev.github.io/blog/">Machaon.Dev</a></span>
+    <span>&middot;</span>
+    <span>Сделано на <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a></span>
+    <span>&middot;</span>
+    <span>Тема <a href="https://git.io/hugopapermod" rel="noopener" target="_blank">PaperMod</a></span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top" accesskey="g">
+    <button class="top-link" id="top-link" type="button">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6">
+            <path d="M12 6H0l6-6z" /></svg>
+    </button>
+</a>
+
+<script type="text/javascript" >
+   (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+   m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+   (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+   ym(69199438, "init", {
+        clickmap:true,
+        trackLinks:true,
+        accurateTrackBounce:true,
+        webvisor:true
+   });
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/69199438" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+
+<script>
+    window.onload = function () {
+        if (localStorage.getItem("menu-scroll-position")) {
+            document.getElementById('menu').scrollLeft = localStorage.getItem("menu-scroll-position");
+        }
+    }
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            document.querySelector(`[id='${id}']`).scrollIntoView({
+                behavior: "smooth"
+            });
+        });
+    });
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+    function menu_on_scroll() {
+        localStorage.setItem("menu-scroll-position", document.getElementById('menu').scrollLeft);
+    }
+</script>
+<script>
+    localStorage.removeItem("pref-theme");
+</script>
+
+</body>
+
+</html>

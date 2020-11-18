@@ -6,7 +6,16 @@
     <description>Recent content in Posts on Machaon.Dev</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ru-ru</language>
-    <lastBuildDate>Tue, 17 Nov 2020 16:00:00 +0300</lastBuildDate><atom:link href="https://machaon-dev.github.io/blog/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 18 Nov 2020 14:00:00 +0300</lastBuildDate><atom:link href="https://machaon-dev.github.io/blog/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Пять способов улучшить читабельность кода</title>
+      <link>https://machaon-dev.github.io/blog/posts/on-code-readability/</link>
+      <pubDate>Wed, 18 Nov 2020 14:00:00 +0300</pubDate>
+      
+      <guid>https://machaon-dev.github.io/blog/posts/on-code-readability/</guid>
+      <description>Для тех, кто ищет быстрые ответы, не желая читать весь текст, вот краткое содержание:&lt;br&gt; Повторно используйте код, который повторяется более одного раза.&lt;br&gt; Читабельность и простота поддержки важнее универсальности.&lt;br&gt; Делайте модули, классы и компоненты как можно меньше.&lt;br&gt; Используйте правила и стандарты для кода.&lt;br&gt; Пишите код, как будто вы в команде, даже если работаете один.</description>
+    </item>
+    
     <item>
       <title>Проблемы ссылок mailto и что с этим делать</title>
       <link>https://machaon-dev.github.io/blog/posts/trouble-with-mailto-links/</link>
