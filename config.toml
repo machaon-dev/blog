@@ -14,6 +14,9 @@ disableThemeToggle = true
 #Title = "Hello there 👽"
 #Content = "Can be [Info](/test), links, about..."
 
+[taxonomies]
+tag = "tags"
+
 [markup]
   [markup.highlight]
     style = "github"
@@ -21,3 +24,15 @@ disableThemeToggle = true
       [markup.goldmark.renderer]
         unsafe = true
 
+[menu]
+  [[menu.main]]
+    identifier = "team"
+    name = "Team"
+    url = "/tags/team/"
+    weight = 10
+
+  [[menu.main]]
+    identifier = "code"
+    name = "Code"
+    url = "/tags/code/"
+    weight = 20

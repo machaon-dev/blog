@@ -3,6 +3,7 @@ title: "Пять способов улучшить читабельность к
 date: 2020-11-18T14:00:00+03:00
 draft: false
 author: "Константин Лихачев"
+tags: ["code"]
 description:
     Пять способов улучшить читабельность кода
 summary:
@@ -90,7 +91,7 @@ TL;DR
 Вот пример такого файла:
 
     root = true
-    
+
     [*]
     charset = utf-8
     end_of_line = lf
@@ -99,11 +100,11 @@ TL;DR
     insert_final_newline = false
     max_line_length = 120
     tab_width = 4
-    
+
     [*.md]
     max_line_length = off
     trim_trailing_whitespace = false
-    
+
 
 Подробнее про формат файла можно почитать на [editorconfig.org](https://editorconfig.org/)
 

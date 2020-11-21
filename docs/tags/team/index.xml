@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>team on Machaon.Dev</title>
+    <link>https://machaon-dev.github.io/blog/tags/team/</link>
+    <description>Recent content in team on Machaon.Dev</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ru-ru</language>
+    <lastBuildDate>Fri, 30 Oct 2020 12:59:00 +0300</lastBuildDate><atom:link href="https://machaon-dev.github.io/blog/tags/team/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Going remote: советы самому себе перед вторым локдауном</title>
+      <link>https://machaon-dev.github.io/blog/posts/going-remote/</link>
+      <pubDate>Fri, 30 Oct 2020 12:59:00 +0300</pubDate>
+      
+      <guid>https://machaon-dev.github.io/blog/posts/going-remote/</guid>
+      <description>2020 год определенно запомнится нам надолго, в том числе благодаря всеобщей вынужденной удаленке. Для многих компаний это стало настоящим испытанием, но мы выдержали его достойно. Впереди (не точно) карантин №2 — самое время обдумать и записать, как жить и работать в новой реальности</description>
+    </item>
+    
+  </channel>
+</rss>

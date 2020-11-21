@@ -3,12 +3,22 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://machaon-dev.github.io/blog/tags/code/</loc>
+    <lastmod>2020-11-18T14:00:00+03:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://machaon-dev.github.io/blog/</loc>
     <lastmod>2020-11-18T14:00:00+03:00</lastmod>
   </url>
   
   <url>
     <loc>https://machaon-dev.github.io/blog/posts/</loc>
+    <lastmod>2020-11-18T14:00:00+03:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://machaon-dev.github.io/blog/tags/</loc>
     <lastmod>2020-11-18T14:00:00+03:00</lastmod>
   </url>
   
@@ -20,6 +30,11 @@
   <url>
     <loc>https://machaon-dev.github.io/blog/posts/trouble-with-mailto-links/</loc>
     <lastmod>2020-11-17T16:00:00+03:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://machaon-dev.github.io/blog/tags/bitrix/</loc>
+    <lastmod>2020-11-12T18:00:00+03:00</lastmod>
   </url>
   
   <url>
@@ -38,11 +53,8 @@
   </url>
   
   <url>
-    <loc>https://machaon-dev.github.io/blog/categories/</loc>
-  </url>
-  
-  <url>
-    <loc>https://machaon-dev.github.io/blog/tags/</loc>
+    <loc>https://machaon-dev.github.io/blog/tags/team/</loc>
+    <lastmod>2020-10-30T12:59:00+03:00</lastmod>
   </url>
   
 </urlset>
