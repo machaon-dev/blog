@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ru" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<title>Ajax-контроллеры в Битрикс - Machaon.Dev</title>
+
+<meta name="keywords" content="code" />
+<meta name="description" content="Изучаем компоненты-контроллеры в Bitrix Framework">
+<meta name="author" content="Вячеслав Чулкин">
+<link rel="canonical" href="https://machaon-dev.github.io/blog/posts/bitrix-ajax-controllers/" />
+<link href="https://machaon-dev.github.io/blog/assets/css/stylesheet.min.bcea0e63ad1190adaad58635af831e12a59dcbb3b1f45507edc570bd7244a2be.css" integrity="sha256-vOoOY60RkK2q1YY1r4MeEqWdy7Ox9FUH7cVwvXJEor4=" rel="preload stylesheet"
+    as="style">
+<link rel="manifest" href="https://machaon-dev.github.io/blog/site.webmanifest">
+<link rel="icon" href="https://machaon-dev.github.io/blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://machaon-dev.github.io/blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://machaon-dev.github.io/blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://machaon-dev.github.io/blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://machaon-dev.github.io/blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<meta name="generator" content="Hugo 0.78.1" />
+
+
+
+
+</head>
+
+<body class="single" id="top">
+<noscript>
+    <style type="text/css">
+        .theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+</noscript>
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://machaon-dev.github.io/blog/" accesskey="h">Machaon.Dev</a>
+            <span class="logo-switches">
+                
+            </span>
+        </div>
+        <ul class="menu" id="menu" onscroll="menu_on_scroll()">
+            <li>
+                <a href="https://machaon-dev.github.io/blog/tags/team/">
+                    <span>
+                        Team
+                    </span>
+                </a>
+            </li>
+            <li>
+                <a href="https://machaon-dev.github.io/blog/tags/code/">
+                    <span>
+                        Code
+                    </span>
+                </a>
+            </li></ul>
+    </nav>
+</header>
+
+    <main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <h1 class="post-title">
+      Ajax-контроллеры в Битрикс
+    </h1>
+    <div class="post-meta">
+
+28 декабря 2020&nbsp;·&nbsp;Вячеслав Чулкин
+
+    </div>
+  </header> 
+
+  <div class="post-content"><p>Контроллеры — это часть MVC архитектуры, которая отвечает за обработку запроса и генерирование ответа. Сразу оговоримся, что дальше речь пойдет про компоненты-контроллеры в контексте Bitrix Framework.</p>
+<p>Битрикс-контроллер принимает от клиента запрос и возвращает JSON с результатом или ошибкой. Классы-контроллеры содержат одно или несколько методов-действий и являются надстройкой над обычными компонентами, поэтому их нужно размещать в файле <code>class.php</code> компонента.</p>
+<h2 id="бекенд">Бекенд</h2>
+<p>Тут все просто: в компоненте нужно реализовать интерфейс <code>Controllerable</code>, в ктором есть метод <code>configureActions()</code>. Этот метод возвращает массив с действиями которые можно вызвать. Например, для действия <code>send</code> нужно будет создать метод <code>sendAction</code>.</p>
+<p>Метод-действие возвращает массив, который затем отдается клиенту в виде JSON.</p>
+<p>Если требуется отдавать на сторону клиента ошибки, то нужно реализовать интерфейс <code>Errorable</code>, в котором есть методы <code>getErrors()</code> и <code>getErrorByCode()</code>. Также нужно будет реализовать коллекцию ошибок <code>ErrorCollection</code>, ее удобнее всего создать в методе <code>onPrepareComponentParams()</code>.</p>
+<p>В качестве простого примера создадим контроллер для формы обратной связи. Компонент пусть называется <code>machaon:feedback</code>, код контроллера разместится в файле <code>/local/components/machaon/feedback/class.php</code>.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php"><span style="color:#000;font-weight:bold">&lt;?</span>php
+<span style="color:#998;font-style:italic">//local/components/machaon/feedback/class.php
+</span><span style="color:#998;font-style:italic"></span>
+<span style="color:#000;font-weight:bold">namespace</span> Machaon\Components;
+
+<span style="color:#000;font-weight:bold">use</span> Bitrix\Main\Error;
+<span style="color:#000;font-weight:bold">use</span> Bitrix\Main\Errorable;
+<span style="color:#000;font-weight:bold">use</span> Bitrix\Main\ErrorCollection;
+<span style="color:#000;font-weight:bold">use</span> Bitrix\Main\Engine\ActionFilter;
+<span style="color:#000;font-weight:bold">use</span> Bitrix\Main\Engine\Contract\Controllerable;
+<span style="color:#000;font-weight:bold">use</span> CBitrixComponent;
+
+<span style="color:#000;font-weight:bold">class</span> <span style="color:#458;font-weight:bold">FeedbackComponent</span> <span style="color:#000;font-weight:bold">extends</span> CBitrixComponent <span style="color:#000;font-weight:bold">implements</span> Controllerable, Errorable
+{
+    <span style="color:#000;font-weight:bold">protected</span> ErrorCollection <span style="color:#008080">$errorCollection</span>;
+
+    <span style="color:#000;font-weight:bold">public</span> <span style="color:#000;font-weight:bold">function</span> <span style="color:#900;font-weight:bold">onPrepareComponentParams</span>(<span style="color:#008080">$arParams</span>)
+    {
+        <span style="color:#008080">$this</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">errorCollection</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">new</span> ErrorCollection();
+        <span style="color:#000;font-weight:bold">return</span> <span style="color:#008080">$arParams</span>;
+    }
+
+    <span style="color:#000;font-weight:bold">public</span> <span style="color:#000;font-weight:bold">function</span> <span style="color:#900;font-weight:bold">executeComponent</span>()
+    {
+        <span style="color:#998;font-style:italic">// Метод не будет вызван при ajax запросе
+</span><span style="color:#998;font-style:italic"></span>    }
+
+    <span style="color:#000;font-weight:bold">public</span> <span style="color:#000;font-weight:bold">function</span> <span style="color:#900;font-weight:bold">getErrors</span>()<span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">array</span>
+    {
+        <span style="color:#000;font-weight:bold">return</span> <span style="color:#008080">$this</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">errorCollection</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">toArray</span>();
+    }
+
+    <span style="color:#000;font-weight:bold">public</span> <span style="color:#000;font-weight:bold">function</span> <span style="color:#900;font-weight:bold">getErrorByCode</span>(<span style="color:#008080">$code</span>)<span style="color:#000;font-weight:bold">:</span> Error
+    {
+        <span style="color:#000;font-weight:bold">return</span> <span style="color:#008080">$this</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">errorCollection</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">getErrorByCode</span>(<span style="color:#008080">$code</span>);
+    }
+
+    <span style="color:#998;font-style:italic">// Описываем действия
+</span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">public</span> <span style="color:#000;font-weight:bold">function</span> <span style="color:#900;font-weight:bold">configureActions</span>()<span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">array</span>
+    {
+        <span style="color:#000;font-weight:bold">return</span> [
+            <span style="color:#d14">&#39;send&#39;</span> <span style="color:#000;font-weight:bold">=&gt;</span> [
+                <span style="color:#d14">&#39;prefilters&#39;</span> <span style="color:#000;font-weight:bold">=&gt;</span> [
+                    <span style="color:#998;font-style:italic">// здесь указываются опциональные фильтры, например:
+</span><span style="color:#998;font-style:italic"></span>                    <span style="color:#000;font-weight:bold">new</span> ActionFilter\Authentication(), <span style="color:#998;font-style:italic">// проверяет авторизован ли пользователь
+</span><span style="color:#998;font-style:italic"></span>                ]
+            ]
+        ];
+    }
+
+    <span style="color:#998;font-style:italic">// Сюда передаются параметры из ajax запроса, навания точно такие же как и при отправке запроса.
+</span><span style="color:#998;font-style:italic"></span>    <span style="color:#998;font-style:italic">// $_REQUEST[&#39;username&#39;] будет передан в $username, $_REQUEST[&#39;email&#39;] будет передан в $email и т.д.
+</span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">public</span> <span style="color:#000;font-weight:bold">function</span> <span style="color:#900;font-weight:bold">sendAction</span>(string <span style="color:#008080">$username</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#39;&#39;</span>, string <span style="color:#008080">$email</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#39;&#39;</span>, string <span style="color:#008080">$message</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#39;&#39;</span>)<span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">array</span>
+    {
+        <span style="color:#000;font-weight:bold">try</span> {
+            <span style="color:#008080">$this</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">doSomeWork</span>();
+            <span style="color:#000;font-weight:bold">return</span> [
+                <span style="color:#d14">&#34;result&#34;</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#d14">&#34;Ваше сообщение принято&#34;</span>,
+            ];
+        } <span style="color:#000;font-weight:bold">catch</span> (Exceptions\EmptyEmail <span style="color:#008080">$e</span>) {
+            <span style="color:#008080">$this</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">errorCollection</span>[] <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">new</span> Error(<span style="color:#008080">$e</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#008080">getMessage</span>());
+            <span style="color:#000;font-weight:bold">return</span> [
+                <span style="color:#d14">&#34;result&#34;</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#d14">&#34;Произошла ошибка&#34;</span>,
+            ];
+        }
+    }
+}
+</code></pre></div><h2 id="фронтенд">Фронтенд</h2>
+<p>В js-библиотеке Битрикс уже есть функция для отправки запросов. Далее простой пример, где <code>machaon:feedback</code> это имя компонента, <code>send</code> — имя действия, а в <code>data: {}</code> передаются необходимые данные:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-js" data-lang="js">BX.ajax.runComponentAction(<span style="color:#d14">&#34;machaon:feedback&#34;</span>, <span style="color:#d14">&#34;send&#34;</span>, {
+    mode<span style="color:#000;font-weight:bold">:</span> <span style="color:#d14">&#34;class&#34;</span>,
+    data<span style="color:#000;font-weight:bold">:</span> {
+        <span style="color:#d14">&#34;email&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#d14">&#34;vasya@email.tld&#34;</span>,
+        <span style="color:#d14">&#34;username&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#d14">&#34;Василий&#34;</span>,
+        <span style="color:#d14">&#34;message&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#d14">&#34;Где мой заказ? Жду уже целый час!&#34;</span>
+    }
+}).then(<span style="color:#000;font-weight:bold">function</span> (response) {
+    <span style="color:#998;font-style:italic">// обработка ответа
+</span><span style="color:#998;font-style:italic"></span>});
+</code></pre></div><p>Если все хорошо, с бэкенда нам вернется:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
+    <span style="color:#000080">&#34;status&#34;</span>: <span style="color:#d14">&#34;success&#34;</span>,
+    <span style="color:#000080">&#34;data&#34;</span>: {
+        <span style="color:#000080">&#34;result&#34;</span>: <span style="color:#d14">&#34;Письмо отправлено&#34;</span>
+    },
+    <span style="color:#000080">&#34;errors&#34;</span>: []
+}
+</code></pre></div><p>Либо сообщение об ошибке:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
+    <span style="color:#000080">&#34;status&#34;</span>: <span style="color:#d14">&#34;error&#34;</span>,
+    <span style="color:#000080">&#34;data&#34;</span>: {
+        <span style="color:#000080">&#34;result&#34;</span>: <span style="color:#d14">&#34;Произошла ошибка&#34;</span>
+    },
+    <span style="color:#000080">&#34;errors&#34;</span>: [{
+        <span style="color:#000080">&#34;message&#34;</span>: <span style="color:#d14">&#34;Не заполено поле Email&#34;</span>,
+        <span style="color:#000080">&#34;code&#34;</span>: <span style="color:#099">0</span>,
+        <span style="color:#000080">&#34;customData&#34;</span>: <span style="color:#000;font-weight:bold">null</span>
+    }]
+}
+</code></pre></div><h2 id="отправка-запроса-напрямую">Отправка запроса напрямую</h2>
+<p>Если не хочется использовать <code>BX.ajax.runComponentAction()</code>, можно отправить запрос напрямую, например используя jQuery. Нужно отправить запрос на <code>/bitrix/services/main/ajax.php</code>, он будет выглядеть примерно так:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-js" data-lang="js">$.post(
+    <span style="color:#d14">&#34;/bitrix/services/main/ajax.php?mode=class&amp;c=machaon:feedback&amp;action=send&#34;</span>,
+    {
+        <span style="color:#d14">&#34;email&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#d14">&#34;vasya@email.tld&#34;</span>,
+        <span style="color:#d14">&#34;username&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#d14">&#34;Василий&#34;</span>,
+        <span style="color:#d14">&#34;message&#34;</span><span style="color:#000;font-weight:bold">:</span> <span style="color:#d14">&#34;Где мой заказ? Жду уже целый час!&#34;</span>
+    },
+    <span style="color:#000;font-weight:bold">function</span> (response) {
+        console.log(response);
+    }
+);
+</code></pre></div><p>В параметре <code>mode</code> передается обязательное значение <code>class</code>, в <code>c</code> передается имя компонента в формате <code>vendor:component</code>, <code>action</code> это запускаемый метод.</p>
+<p>Эти параметры обязательно должны передаваться в адресе запроса, иначе происходит ошибка.</p>
+<p><code>email</code>, <code>username</code> и <code>message</code> станут затем параметрами <code>$email</code>, <code>$username</code> и <code>$message</code> в методе <code>sendAction()</code>.</p>
+<h2 id="использование-чпу">Использование ЧПУ</h2>
+<p>Также можно в <code>urlrewrite.php</code> прописать красивый адрес, например <code>/api/rest-component/&lt;component_vendor&gt;/&lt;component_name&gt;/&lt;action&gt;/</code>.</p>
+<p>Для этого добавим в <code>urlrewrite.php</code> следующий массив:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php"><span style="color:#008080">$arUrlRewrite</span> <span style="color:#000;font-weight:bold">=</span> [
+    <span style="color:#998;font-style:italic">// ...
+</span><span style="color:#998;font-style:italic"></span>    [
+        <span style="color:#d14">&#34;CONDITION&#34;</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#d14">&#34;#^/api/rest-component/([a-zA-Z0-9]+)/([a-zA-Z0-9\.]+)/([a-zA-Z0-9]+)/?.*#&#34;</span>,
+        <span style="color:#d14">&#34;RULE&#34;</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#d14">&#34;mode=class&amp;c=$1:$2&amp;action=$3&#34;</span>,
+        <span style="color:#d14">&#34;PATH&#34;</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#d14">&#34;/bitrix/services/main/ajax.php&#34;</span>,
+    ],
+];
+</code></pre></div><p>Тогда запрос будет выглядеть понятнее:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-js" data-lang="js"><span style="color:#000;font-weight:bold">function</span> sendFeedback(form) {
+    <span style="color:#000;font-weight:bold">const</span> route <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;/api/rest-component/machaon/feedback/send/&#34;</span>;
+    <span style="color:#000;font-weight:bold">const</span> data <span style="color:#000;font-weight:bold">=</span> $(form).serialize();
+    $.post(route, data, <span style="color:#000;font-weight:bold">function</span> (response) {
+        console.log(response);
+    });
+}
+</code></pre></div><h2 id="нюансы">Нюансы</h2>
+<p>Если в <code>configureActions()</code> оставить пустой массив <code>prefilters</code>, то метод-действие будет работать без фильтров.</p>
+<p>Но если не указывать ключ <code>prefilters</code>, то будут применены фильтры по умолчанию — <code>ActionFilter\Authentication</code> и <code>ActionFilter\Csrf</code>.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php"><span style="color:#000;font-weight:bold">public</span> <span style="color:#000;font-weight:bold">function</span> <span style="color:#900;font-weight:bold">configureActions</span>()<span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">array</span>
+{
+    <span style="color:#000;font-weight:bold">return</span> [
+        <span style="color:#d14">&#39;send&#39;</span> <span style="color:#000;font-weight:bold">=&gt;</span> [
+            <span style="color:#d14">&#39;prefilters&#39;</span> <span style="color:#000;font-weight:bold">=&gt;</span> [] <span style="color:#998;font-style:italic">// метод sendAction() будет работать без фильтров
+</span><span style="color:#998;font-style:italic"></span>        ]
+    ];
+}
+</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php"><span style="color:#000;font-weight:bold">public</span> <span style="color:#000;font-weight:bold">function</span> <span style="color:#900;font-weight:bold">configureActions</span>()<span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">array</span>
+{
+    <span style="color:#000;font-weight:bold">return</span> [
+        <span style="color:#d14">&#39;send&#39;</span> <span style="color:#000;font-weight:bold">=&gt;</span> []  <span style="color:#998;font-style:italic">// метод sendAction() будет работать у авторизованных пользователей, которые передали CSRF-токен
+</span><span style="color:#998;font-style:italic"></span>    ];
+}
+</code></pre></div><p>Пример ошибки когда пользователь не авторизован и не передал токен:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
+  <span style="color:#000080">&#34;status&#34;</span>: <span style="color:#d14">&#34;error&#34;</span>,
+  <span style="color:#000080">&#34;data&#34;</span>: <span style="color:#000;font-weight:bold">null</span>,
+  <span style="color:#000080">&#34;errors&#34;</span>: [
+    {
+      <span style="color:#000080">&#34;message&#34;</span>: <span style="color:#d14">&#34;Необходимо авторизоваться на сайте&#34;</span>,
+      <span style="color:#000080">&#34;code&#34;</span>: <span style="color:#d14">&#34;invalid_authentication&#34;</span>,
+      <span style="color:#000080">&#34;customData&#34;</span>: <span style="color:#000;font-weight:bold">null</span>
+    },
+    {
+      <span style="color:#000080">&#34;message&#34;</span>: <span style="color:#d14">&#34;Invalid csrf token&#34;</span>,
+      <span style="color:#000080">&#34;code&#34;</span>: <span style="color:#d14">&#34;invalid_csrf&#34;</span>,
+      <span style="color:#000080">&#34;customData&#34;</span>: {
+        <span style="color:#000080">&#34;csrf&#34;</span>: <span style="color:#d14">&#34;dc8adda3ac983217623cf1196dfc5c61&#34;</span>
+      }
+    }
+  ]
+}
+</code></pre></div><p>Если требуется CSRF-защита, то для фильтра <code>\Bitrix\Main\Engine\ActionFilter\Csrf </code>нужно передать идентификатор сессии в параметре <code>sessid</code>.</p>
+<p>На бэкенде его можно получить функцией <code>bitrix_sessid()</code>, на фронтенде — <code>BX.bitrix_sessid()</code>.</p>
+<p>При использовании <code>BX.ajax.runComponentAction()</code> сессия передается автоматически.</p>
+<p>Другие фильтры можно посмотреть в <a href="https://dev.1c-bitrix.ru/api_d7/bitrix/main/engine/actionfilter/index.php">документации</a></p>
+</div>
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://machaon-dev.github.io/blog/tags/code">code</a></li>
+    </ul>
+  </footer>
+</article>
+    </main><footer class="footer">
+    <span>&copy; 2020 <a href="https://machaon-dev.github.io/blog/">Machaon.Dev</a></span>
+    <span>&middot;</span>
+    <span>Сделано на <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a></span>
+    <span>&middot;</span>
+    <span>Тема <a href="https://git.io/hugopapermod" rel="noopener" target="_blank">PaperMod</a></span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top" accesskey="g">
+    <button class="top-link" id="top-link" type="button">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6">
+            <path d="M12 6H0l6-6z" /></svg>
+    </button>
+</a>
+
+<script type="text/javascript" >
+   (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+   m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+   (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+   ym(69199438, "init", {
+        clickmap:true,
+        trackLinks:true,
+        accurateTrackBounce:true,
+        webvisor:true
+   });
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/69199438" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+
+<script>
+    window.onload = function () {
+        if (localStorage.getItem("menu-scroll-position")) {
+            document.getElementById('menu').scrollLeft = localStorage.getItem("menu-scroll-position");
+        }
+    }
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            document.querySelector(`[id='${id}']`).scrollIntoView({
+                behavior: "smooth"
+            });
+        });
+    });
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+    function menu_on_scroll() {
+        localStorage.setItem("menu-scroll-position", document.getElementById('menu').scrollLeft);
+    }
+</script>
+<script>
+    localStorage.removeItem("pref-theme");
+</script>
+
+</body>
+
+</html>

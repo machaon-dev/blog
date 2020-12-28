@@ -3,23 +3,38 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://machaon-dev.github.io/blog/posts/bitrix-ajax-controllers/</loc>
+    <lastmod>2020-12-28T12:00:00+03:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://machaon-dev.github.io/blog/tags/code/</loc>
-    <lastmod>2020-11-23T12:00:00+03:00</lastmod>
+    <lastmod>2020-12-28T12:00:00+03:00</lastmod>
   </url>
   
   <url>
     <loc>https://machaon-dev.github.io/blog/</loc>
-    <lastmod>2020-11-23T12:00:00+03:00</lastmod>
+    <lastmod>2020-12-28T12:00:00+03:00</lastmod>
   </url>
   
   <url>
     <loc>https://machaon-dev.github.io/blog/posts/</loc>
-    <lastmod>2020-11-23T12:00:00+03:00</lastmod>
+    <lastmod>2020-12-28T12:00:00+03:00</lastmod>
   </url>
   
   <url>
     <loc>https://machaon-dev.github.io/blog/tags/</loc>
-    <lastmod>2020-11-23T12:00:00+03:00</lastmod>
+    <lastmod>2020-12-28T12:00:00+03:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://machaon-dev.github.io/blog/tags/team/</loc>
+    <lastmod>2020-11-26T10:59:00+03:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://machaon-dev.github.io/blog/posts/internal-startup/</loc>
+    <lastmod>2020-11-26T10:59:00+03:00</lastmod>
   </url>
   
   <url>
@@ -54,11 +69,6 @@
   
   <url>
     <loc>https://machaon-dev.github.io/blog/posts/going-remote/</loc>
-    <lastmod>2020-10-30T12:59:00+03:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://machaon-dev.github.io/blog/tags/team/</loc>
     <lastmod>2020-10-30T12:59:00+03:00</lastmod>
   </url>
   

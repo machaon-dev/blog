@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ru" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<title>Внутренний стартап: как мы делали продукт в сервисной компании - Machaon.Dev</title>
+
+<meta name="keywords" content="team" />
+<meta name="description" content="Мотивируем команду, прокачиваем навыки и приносим пользу компании">
+<meta name="author" content="Евгений Задорин">
+<link rel="canonical" href="https://machaon-dev.github.io/blog/posts/internal-startup/" />
+<link href="https://machaon-dev.github.io/blog/assets/css/stylesheet.min.bcea0e63ad1190adaad58635af831e12a59dcbb3b1f45507edc570bd7244a2be.css" integrity="sha256-vOoOY60RkK2q1YY1r4MeEqWdy7Ox9FUH7cVwvXJEor4=" rel="preload stylesheet"
+    as="style">
+<link rel="manifest" href="https://machaon-dev.github.io/blog/site.webmanifest">
+<link rel="icon" href="https://machaon-dev.github.io/blog/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://machaon-dev.github.io/blog/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://machaon-dev.github.io/blog/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://machaon-dev.github.io/blog/apple-touch-icon.png">
+<link rel="mask-icon" href="https://machaon-dev.github.io/blog/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<meta name="generator" content="Hugo 0.78.1" />
+
+
+
+
+</head>
+
+<body class="single" id="top">
+<noscript>
+    <style type="text/css">
+        .theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+</noscript>
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://machaon-dev.github.io/blog/" accesskey="h">Machaon.Dev</a>
+            <span class="logo-switches">
+                
+            </span>
+        </div>
+        <ul class="menu" id="menu" onscroll="menu_on_scroll()">
+            <li>
+                <a href="https://machaon-dev.github.io/blog/tags/team/">
+                    <span>
+                        Team
+                    </span>
+                </a>
+            </li>
+            <li>
+                <a href="https://machaon-dev.github.io/blog/tags/code/">
+                    <span>
+                        Code
+                    </span>
+                </a>
+            </li></ul>
+    </nav>
+</header>
+
+    <main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <h1 class="post-title">
+      Внутренний стартап: как мы делали продукт в сервисной компании
+    </h1>
+    <div class="post-meta">
+
+26 ноября 2020&nbsp;·&nbsp;Евгений Задорин
+
+    </div>
+  </header> 
+
+  <div class="post-content"><blockquote>
+<p>Эта статья изначально была опубликована <a href="https://habr.com/ru/post/529992/">на Хабре</a></p>
+</blockquote>
+<p>Наша компания занимается заказной разработкой. Мы параллельно ведем достаточно много проектов с разной активностью и объемом работы. Каждую неделю менеджеры проектов созваниваются, чтобы сверить текущее состояние дел, составить план на будущую неделю и распределить задачи между разработчиками. Когда я стал тимлидом, в мои обязанности добавилось участие в этих летучках.</p>
+<p>Я довольно быстро понял, что летучки проходят не очень эффективно, потому что перед глазами не было общей и цельной картины, кто из разработчиков перегружен, а кто, наоборот, простаивает.</p>
+<p>Мы используем Redmine для управления задачами. Это несколько старомодный, но удобный и проверенный временем бесплатный инструмент. Фатальным недостатком в нашем случае оказалось отсутствие понятной общей сводки по текущим задачам.</p>
+<p><img src="https://habrastorage.org/webt/i4/gi/9u/i4gi9u81o_rdmlfpitzfvxofwvs.jpeg" alt="Ручной прототип"></p>
+<h2 id="концепт-проекта">Концепт проекта</h2>
+<p>Стоит сразу уточнить, что возможность вывести общую сводку на самом деле есть, но только для админа, которому доступны все проекты. На практике каждому менеджеру доступен только определенный срез проектов и задач.</p>
+<p>После нескольких созвонов я пришел к пониманию, как всё должно выглядеть, ведь я рисовал один и тот же интерфейс на бумаге по итогам каждой летучки. Итак, нам нужен trello-подобный дашборд, в котором у каждого сотрудника есть столбец с карточками-задачами.</p>
+<h2 id="первый-прототип">Первый прототип</h2>
+<p>Я выяснил, что у Redmine есть вполне сносное REST API и на какое-то время положил идею на полку, дозреть. По правде говоря, из-за большого потока текущих задач было попросту не до того.</p>
+<p>В один прекрасный день ко мне пришел наш junior frontend разработчик Никита и прямо спросил, нет ли у меня каких-то идей для прокачки его навыков, помимо основных рабочих проектов. «Дружище, ты не поверишь», — подумал я.</p>
+<p>Мы быстро обсудили общий концепт, определились со стеком — Никита хотел глубже изучить Vue.js и его экосистему. Пока он верстал интерфейс, разбирался с vue-cli и vuex, мне нужно было срочно сделать ему API, с которым он будет работать. Мы решили, что делать запросы напрямую с фронтенда к Redmine будет не слишком удобно и безопасно, поэтому добавили некий бэкенд, который выступал в качестве прокси.</p>
+<p>Бэкендом это называть, конечно, смешно, потому что фактически это были два php-файла общим объемом где-то 200 строк, без всяких зависимостей. Один для получения общей сводки (задачи/люди), второй для авторизации.</p>
+<p>Черт, да я даже поленился использовать <code>cURL</code> и обошелся функцией <code>file_get_contents()</code>. Выглядело это примерно так:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php"><span style="color:#008080">$host</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#39;https://redmine.app&#39;</span>;
+<span style="color:#008080">$apiKey</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#39;*****&#39;</span>;
+<span style="color:#008080">$context</span> <span style="color:#000;font-weight:bold">=</span> stream_context_create([
+    <span style="color:#d14">&#34;http&#34;</span> <span style="color:#000;font-weight:bold">=&gt;</span> [
+        <span style="color:#d14">&#34;method&#34;</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#d14">&#34;GET&#34;</span>,
+        <span style="color:#d14">&#34;header&#34;</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#d14">&#34;X-Redmine-API-Key: </span><span style="color:#d14">$apiKey</span><span style="color:#d14">&#34;</span>
+    ]
+]);
+
+<span style="color:#008080">$projects</span> <span style="color:#000;font-weight:bold">=</span> file_get_contents(<span style="color:#d14">&#34;</span><span style="color:#d14">$host</span><span style="color:#d14">/projects.json&#34;</span>, <span style="color:#000;font-weight:bold">false</span>, <span style="color:#008080">$context</span>);
+</code></pre></div><p>А что там с авторизацией? Что сейчас в моде при разработке SPA, JSON Web Tokens? Я вас умоляю, пусть будет cookie-based авторизация. Клиент отправляет POST-запрос, содержащий логин и пароль, на наш микро-бэкенд. Бэкенд вызывает функцию с глубокомысленным названием <code>checkRedmineUser($login, $password)</code>, которая пытается авторизоваться в редмайне не с админским ключом, а именно с этой парой логин-пароль.</p>
+<p>Что-то вроде такого:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php"><span style="color:#008080">$auth</span> <span style="color:#000;font-weight:bold">=</span> base64_encode(<span style="color:#d14">&#34;</span><span style="color:#d14">$login</span><span style="color:#d14">:</span><span style="color:#d14">$password</span><span style="color:#d14">&#34;</span>);
+<span style="color:#008080">$opts</span> <span style="color:#000;font-weight:bold">=</span> [
+    <span style="color:#d14">&#34;http&#34;</span> <span style="color:#000;font-weight:bold">=&gt;</span> [
+        <span style="color:#d14">&#34;method&#34;</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#d14">&#34;GET&#34;</span>,
+        <span style="color:#d14">&#34;header&#34;</span> <span style="color:#000;font-weight:bold">=&gt;</span> [
+            <span style="color:#d14">&#34;Authorization: Basic </span><span style="color:#d14">$auth</span><span style="color:#d14">&#34;</span>
+        ],
+        <span style="color:#d14">&#34;ignore_errors&#34;</span> <span style="color:#000;font-weight:bold">=&gt;</span> <span style="color:#000;font-weight:bold">true</span>,
+    ]
+];
+
+<span style="color:#008080">$context</span> <span style="color:#000;font-weight:bold">=</span> stream_context_create(<span style="color:#008080">$opts</span>);
+<span style="color:#008080">$response</span> <span style="color:#000;font-weight:bold">=</span> file_get_contents(<span style="color:#d14">&#34;</span><span style="color:#d14">$host</span><span style="color:#d14">/users/current.json&#34;</span>, <span style="color:#000;font-weight:bold">false</span>, <span style="color:#008080">$context</span>);
+</code></pre></div><p>Вот так максимально просто и костыльно я набросал работоспособное API, потратив на это несколько часов. Получилось в духе стартапа: как можно скорее выкатывайте MVP, а в кодовой базе порядок наведете потом.</p>
+<h2 id="а-что-на-фронтенде">А что на фронтенде?</h2>
+<p>Та же атмосфера стартапа — костыли, велосипеды и полный бардак в коде. Зато визуально это выглядело отлично:</p>
+<p><img src="https://habrastorage.org/webt/fm/di/ys/fmdiysthycxuh6urqbprlyjsr5m.png" alt="Первая версия"></p>
+<p>Никита постарался, добавил несколько незапланированных фич от себя, вроде темной/светлой темы и drag-n-drop&rsquo;а столбцов.</p>
+<p>В итоге, первую бету получилось отдать менеджерам спустя неделю после начала разработки, которая, к слову, велась в низкоприоритетном режиме — задачи от внешних заказчиков никто не отменял. Дальше был достаточно долгий период обкатки, исправления замечаний от пользователей, внесения правок по итогам код-ревью, которое я сделал постфактум.</p>
+<h2 id="дальнейшее-развитие">Дальнейшее развитие</h2>
+<p>Проект выстрелил — сейчас это один из основных инструментов наших PM-ов, без него не обходится ни одна летучка. При этом кодовая база практически не изменилась, первый набросок бэкенда оказался на удивление работоспособным и продержался около года. Хотя тут нужно оговориться, что и новых фич было немного — с чего бы ему меняться?</p>
+<p>Тем не менее, у меня в голове червячком сидела мысль: раз уж «стартап взлетел», надо в спокойном режиме выкатить новую версию с красивым бэкендом, моделями, тестами и CI/CD. И когда ко мне пришел бэкенд-разработчик Максим с вопросом, нет ли у меня каких-то идей на прокачку, я снова подумал: «Дружище, ты не поверишь&hellip;».</p>
+<p>Делать бэкенд решили на Laravel, задачи вели прямо в Gitlab, там вполне приличная система issues.</p>
+<p>Декомпозировали на два этапа (milestones в терминах Gitlab) — первым этапом переносили функциональность «как есть» и рефакторили её, вторым — добавляли новые фичи.</p>
+<p>По хорошему, для первого этапа надо было сначала создать тесты, а потом уже рефакторить, так мы были бы уверены, что ничего не отвалится. На практике проект покрыли тестами только под конец, и это тоже был интересный квест для бэкенд-разработчика, которому до этого не приходилось тестировать HTTP API.</p>
+<p>Прогон тестов запускали при каждой отправке кода в репозиторий с помощью Gitlab-CI. Деплой настроили там же — в Яндекс.Облако. Добились, чтобы проект разворачивался локально в docker парой команд.</p>
+<p>Авторизацию вынесли в middleware. Перестали работать с JSON-ответами, как с ассоциативными массивами — вместо этого задействовали DTO. Отказались от констант в пользу перечислений (enums) — для этого притащили в проект пакет <a href="https://packagist.org/packages/spatie/enum">spatie/enum</a>. Заменили <code>file_get_contents()</code> на идеологически верный <a href="https://packagist.org/packages/guzzlehttp/guzzle">guzzle</a>.</p>
+<p>Про новые фичи тоже не забывали. Например, сделали индикатор, который указывает, что сотрудник перегружен. Добавили отдельный дашборд «Мои задачи» — своего рода персональную канбан-доску:</p>
+<p><img src="https://habrastorage.org/webt/zi/m9/rc/zim9rccotdsbvqzzbf3ibau1cnu.png" alt="Мои задачи"></p>
+<h2 id="итоги">Итоги</h2>
+<p>Работая над этим проектом, я осознал и сформулировал для себя несколько тезисов.</p>
+<ol>
+<li>Продуктовая разработка — это интересно и драйвово. Будучи стейкхолдером, ты мыслишь иначе, теперь от тебя зависит, каким в итоге будет продукт. Мозг постоянно генерирует новые фичи, большинство из которых приходится беспощадно выбрасывать с формулировкой «не в MVP».</li>
+<li>Эйфория от запуска бешеная. Причем неважно, что это за продукт, хоть корпоративная сокращалка ссылок. Малый масштаб не должен демотивировать, потому что он вполне укладывается в старое правило Unix: <a href="https://en.wikipedia.org/wiki/Unix_philosophy#Do_One_Thing_and_Do_It_Well">do one thing, and do it well</a>.</li>
+<li>Плюс к мотивации, кстати, словил не только я, а все участники проекта. Issues закрывались, едва успев открыться, ребята реагировали на мои комментарии в pull request&rsquo;ах даже после окончания рабочего дня, несмотря на то, что проект был вполне себе официальным, и заниматься им полагалось в рабочее время.</li>
+<li>Еще одно преимущество при разработке внутренних продуктов — свобода в выборе стека и подхода к разработке. Наконец-то поработать с языками, библиотеками и фреймворками, которые давно хотелось пощупать, но злой тимлид не разрешал использовать в production. Попробовать написать сначала тест, а потом функцию. Разбить задачи на итерации и спланировать спринт, по итогам которого провести ретроспективу. Если при этом не забывать про code review, то получится хорошая прокачка навыков.</li>
+</ol>
+<p>Я доволен тем, что получилось, как это получилось, и уже собираю идеи для новых проектов.</p>
+</div>
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://machaon-dev.github.io/blog/tags/team">team</a></li>
+    </ul>
+  </footer>
+</article>
+    </main><footer class="footer">
+    <span>&copy; 2020 <a href="https://machaon-dev.github.io/blog/">Machaon.Dev</a></span>
+    <span>&middot;</span>
+    <span>Сделано на <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a></span>
+    <span>&middot;</span>
+    <span>Тема <a href="https://git.io/hugopapermod" rel="noopener" target="_blank">PaperMod</a></span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top" accesskey="g">
+    <button class="top-link" id="top-link" type="button">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6">
+            <path d="M12 6H0l6-6z" /></svg>
+    </button>
+</a>
+
+<script type="text/javascript" >
+   (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+   m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+   (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+   ym(69199438, "init", {
+        clickmap:true,
+        trackLinks:true,
+        accurateTrackBounce:true,
+        webvisor:true
+   });
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/69199438" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+
+<script>
+    window.onload = function () {
+        if (localStorage.getItem("menu-scroll-position")) {
+            document.getElementById('menu').scrollLeft = localStorage.getItem("menu-scroll-position");
+        }
+    }
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            document.querySelector(`[id='${id}']`).scrollIntoView({
+                behavior: "smooth"
+            });
+        });
+    });
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+    function menu_on_scroll() {
+        localStorage.setItem("menu-scroll-position", document.getElementById('menu').scrollLeft);
+    }
+</script>
+<script>
+    localStorage.removeItem("pref-theme");
+</script>
+
+</body>
+
+</html>

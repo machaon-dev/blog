@@ -6,7 +6,16 @@
     <description>Recent content in team on Machaon.Dev</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ru-ru</language>
-    <lastBuildDate>Fri, 30 Oct 2020 12:59:00 +0300</lastBuildDate><atom:link href="https://machaon-dev.github.io/blog/tags/team/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 26 Nov 2020 10:59:00 +0300</lastBuildDate><atom:link href="https://machaon-dev.github.io/blog/tags/team/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Внутренний стартап: как мы делали продукт в сервисной компании</title>
+      <link>https://machaon-dev.github.io/blog/posts/internal-startup/</link>
+      <pubDate>Thu, 26 Nov 2020 10:59:00 +0300</pubDate>
+      
+      <guid>https://machaon-dev.github.io/blog/posts/internal-startup/</guid>
+      <description>Мотивируем команду, прокачиваем навыки и приносим пользу компании</description>
+    </item>
+    
     <item>
       <title>Going remote: советы самому себе перед вторым локдауном</title>
       <link>https://machaon-dev.github.io/blog/posts/going-remote/</link>

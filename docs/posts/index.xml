@@ -6,14 +6,32 @@
     <description>Recent content in Posts on Machaon.Dev</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ru-ru</language>
-    <lastBuildDate>Mon, 23 Nov 2020 12:00:00 +0300</lastBuildDate><atom:link href="https://machaon-dev.github.io/blog/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 28 Dec 2020 12:00:00 +0300</lastBuildDate><atom:link href="https://machaon-dev.github.io/blog/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Ajax-контроллеры в Битрикс</title>
+      <link>https://machaon-dev.github.io/blog/posts/bitrix-ajax-controllers/</link>
+      <pubDate>Mon, 28 Dec 2020 12:00:00 +0300</pubDate>
+      
+      <guid>https://machaon-dev.github.io/blog/posts/bitrix-ajax-controllers/</guid>
+      <description>Изучаем компоненты-контроллеры в Bitrix Framework</description>
+    </item>
+    
+    <item>
+      <title>Внутренний стартап: как мы делали продукт в сервисной компании</title>
+      <link>https://machaon-dev.github.io/blog/posts/internal-startup/</link>
+      <pubDate>Thu, 26 Nov 2020 10:59:00 +0300</pubDate>
+      
+      <guid>https://machaon-dev.github.io/blog/posts/internal-startup/</guid>
+      <description>Мотивируем команду, прокачиваем навыки и приносим пользу компании</description>
+    </item>
+    
     <item>
       <title>Три популярных заблуждения программистов</title>
       <link>https://machaon-dev.github.io/blog/posts/3-popular-misconceptions/</link>
       <pubDate>Mon, 23 Nov 2020 12:00:00 +0300</pubDate>
       
       <guid>https://machaon-dev.github.io/blog/posts/3-popular-misconceptions/</guid>
-      <description>Три популярных заблуждения программистов</description>
+      <description>Боремся с синдромом самозванца</description>
     </item>
     
     <item>
